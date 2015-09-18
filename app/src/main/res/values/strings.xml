@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Doctor</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="txt_hint_message_frament_chat"> Your Question? </string>
+    <string name="title_activity_chat">ChatActivity</string>
+    <string name="title_activity_sick_list">SickListActivity</string>
+    <string name="title_activity_sick_detail">SickDetailActivity</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_user_profile">UserProfileActivity</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_notification">NotificationActivity</string>
+    <string name="title_activity_register">RegisterActivity</string>
+    <string name="title_activity_sqlash_screen">SqlashScreen</string>
+</resources>
