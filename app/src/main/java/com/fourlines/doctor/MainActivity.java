@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private List<DrawerItem> drawerDataList;
     private String accessToken;
 
+
     SharedPreferences sharedPreferences;
     private Button btnNavigation;
 
@@ -71,19 +72,23 @@ public class MainActivity extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         slideTabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
 
+
         //get token
         sharedPreferences = getSharedPreferences(Var.MY_PREFERENCES, Context.MODE_PRIVATE);
         accessToken = sharedPreferences.getString(Var.ACCESS_TOKEN, "");
+//        String fullname = sharedPreferences.getString(Var.FULLNAME, "");
         getDataAccount(accessToken, new VolleyCallback() {
             @Override
             public void onSuccess(JSONObject respond) {
                 Log.d("TienDH", respond.toString());
                 try {
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
                     UserItem userItem = responseToObject(respond);
-                    Log.d("TienDH", "fullname: " + userItem.getFullname());
+//                    SharedPreferences.Editor editor = sharedPreferences.edit();
+//                    editor.putString(Var.FULLNAME, userItem.getFullname());
+                    //put status
+//                    editor.commit();
+
                     user = new UserItem(userItem.getId(), userItem.getEmail(), userItem.getFullname(), userItem.getList());
-                    Log.d("TienDH", "fullname: " + user.getFullname());
                     Data.user = user;
                     drawerDataList = initDrawerData(user);
                     drawerAdapter = new CustomDrawerAdapter(getApplicationContext(), R.layout.custom_drawer_item,
@@ -129,10 +134,10 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList initDrawerData(UserItem user) {
         ArrayList list = new ArrayList();
         list.add(new DrawerItem(user.getFullname(), "Tiểu đường", R.drawable.avatar_user));
-        list.add(new DrawerItem("Chỉnh sửa thông tin", R.drawable.ic_edit_profile));
-        list.add(new DrawerItem("Thông báo mới", R.drawable.ic_notif));
-        list.add(new DrawerItem("Cài đặt", R.drawable.ic_setting));
-        list.add(new DrawerItem("Đăng xuất", R.drawable.ic_setting));
+        list.add(new DrawerItem("Chỉnh sửa thông tin", R.string.user_icon));
+        list.add(new DrawerItem("Thông báo mới", R.string.notif_icon));
+        list.add(new DrawerItem("Cài đặt", R.string.settings_icon));
+        list.add(new DrawerItem("Đăng xuất", R.string.logout_icon));
         return list;
     }
 

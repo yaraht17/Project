@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -41,7 +42,7 @@ public class SickListActivity extends AppCompatActivity implements AdapterView.O
     private SickListAdapter sickListAdapter;
     private Button btnBack;
     private ProgressBar progressBar;
-
+    private TextView txtSickListName;
     private SwipeRefreshLayout swipeContainer;
 
     @Override
@@ -52,9 +53,13 @@ public class SickListActivity extends AppCompatActivity implements AdapterView.O
         btnBack = (Button) findViewById(R.id.btnBack);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        txtSickListName = (TextView) findViewById(R.id.txtSickListName);
 
         btnBack.setOnClickListener(this);
         sickListView.setOnItemClickListener(this);
+
+        int index = getIntent().getExtras().getInt(Var.SICK_TYPE_KEY);
+        txtSickListName.setText(Var.SICKTYPE[index]);
 
         sickList = new ArrayList<>();
         if (Data.sickList != null) {

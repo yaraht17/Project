@@ -162,13 +162,13 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
 
     private ArrayList<SickType> createSickType() {
         ArrayList list = new ArrayList();
-        SickType sickType = new SickType(1, R.drawable.chude1, "Hô Hấp");
+        SickType sickType = new SickType(0, R.drawable.chude1, "Hô Hấp");
         list.add(sickType);
-        list.add(new SickType(2, R.drawable.chude1, "Tuần Hoàn"));
-        list.add(new SickType(3, R.drawable.chude1, "Tiêu Hóa"));
-        list.add(new SickType(4, R.drawable.chude1, "Tiết Niệu"));
-        list.add(new SickType(5, R.drawable.chude1, "Xương Khớp"));
-        list.add(new SickType(6, R.drawable.chude1, "Thần Kinh"));
+        list.add(new SickType(1, R.drawable.chude1, "Tuần Hoàn"));
+        list.add(new SickType(2, R.drawable.chude1, "Tiêu Hóa"));
+        list.add(new SickType(3, R.drawable.chude1, "Tiết Niệu"));
+        list.add(new SickType(4, R.drawable.chude1, "Xương Khớp"));
+        list.add(new SickType(5, R.drawable.chude1, "Thần Kinh"));
         return list;
 
     }

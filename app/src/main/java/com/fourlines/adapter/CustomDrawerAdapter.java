@@ -1,6 +1,7 @@
 package com.fourlines.adapter;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ public class CustomDrawerAdapter extends ArrayAdapter<DrawerItem> {
     List<DrawerItem> drawerItemList;
     private LayoutInflater inflater;
     private DrawerItemHolder drawerHolder;
+    Typeface font_awesome;
 
     public CustomDrawerAdapter(Context context, int layoutResourceID,
                                List<DrawerItem> listItems) {
@@ -28,13 +30,11 @@ public class CustomDrawerAdapter extends ArrayAdapter<DrawerItem> {
         this.drawerItemList = listItems;
         inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
+        font_awesome = Typeface.createFromAsset(context.getAssets(), "fontawesome-webfont.ttf");
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // TODO Auto-generated method stub
-
 
         View view = convertView;
         DrawerItem dItem = (DrawerItem) this.drawerItemList.get(position);
@@ -47,10 +47,11 @@ public class CustomDrawerAdapter extends ArrayAdapter<DrawerItem> {
                         .findViewById(R.id.itemLayout);
                 drawerHolder.itemName = (TextView) view
                         .findViewById(R.id.drawer_itemName);
-                drawerHolder.icon = (ImageView) view.findViewById(R.id.drawer_icon);
+                drawerHolder.icon = (TextView) view.findViewById(R.id.drawer_icon);
                 //set view
+                drawerHolder.icon.setTypeface(font_awesome);
                 drawerHolder.itemName.setText(dItem.getItemName());
-                drawerHolder.icon.setImageResource(dItem.getImgResID());
+                drawerHolder.icon.setText(dItem.getImgResID());
                 view.setTag(drawerHolder);
             } else {
                 //header
@@ -78,7 +79,8 @@ public class CustomDrawerAdapter extends ArrayAdapter<DrawerItem> {
     private static class DrawerItemHolder {
         TextView nameUser, statusUser;
         TextView itemName;
-        ImageView icon, avatarUser;
+        TextView icon;
+        ImageView avatarUser;
         LinearLayout headerLayout, itemLayout;
     }
 }

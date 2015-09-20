@@ -31,7 +31,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private TextView txtForgetPass;
     private TextView txtRegister;
 
-
     SharedPreferences sharedPreferences;
 
     @Override

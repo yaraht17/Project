@@ -13,4 +13,10 @@
     <string name="title_activity_notification">NotificationActivity</string>
     <string name="title_activity_register">RegisterActivity</string>
     <string name="title_activity_sqlash_screen">SqlashScreen</string>
+
+    <string name="user_icon">&#xf007;</string>
+    <string name="logout_icon">&#xf08b;</string>
+    <string name="settings_icon">&#xf013;</string>
+    <string name="notif_icon">&#xf0a1;</string>
+
 </resources>
