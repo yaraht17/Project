@@ -63,6 +63,7 @@ public class SickListActivity extends AppCompatActivity implements AdapterView.O
 
         sickList = new ArrayList<>();
         if (Data.sickList != null) {
+            progressBar.setVisibility(View.GONE);
             sickList = Data.sickList;
             sickListAdapter = new SickListAdapter(getApplicationContext(), R.layout.item_sick_list, sickList);
             sickListView.setAdapter(sickListAdapter);

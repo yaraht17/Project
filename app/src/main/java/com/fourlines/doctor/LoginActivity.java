@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -54,25 +55,39 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void actionBtnLogin() {
         AccountItem account = new AccountItem(etxtEmail.getText().toString(), etxtPassword.getText().toString());
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        try {
-            login(account, new VolleyCallback() {
-                @Override
-                public void onSuccess(JSONObject respond) {
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    try {
-                        editor.putString(Var.ACCESS_TOKEN, respond.getString(Var.ACCESS_TOKEN));
-                        editor.commit();
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+        if (account.getUser().equals("")) {
+            Toast.makeText(LoginActivity.this, "Vui lòng nhập Email", Toast.LENGTH_SHORT).show();
+        } else if (account.getPassword().equals("")) {
+            Toast.makeText(LoginActivity.this, "Vui lòng nhập Password", Toast.LENGTH_SHORT).show();
+        } else {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            try {
+                login(account, new VolleyCallback() {
+                    @Override
+                    public void onSuccess(JSONObject respond) {
+                        try {
+                            if (respond.getString("status").equals("fail")) {
+                                Toast.makeText(LoginActivity.this, "Email hoặc mật khẩu sai", Toast.LENGTH_SHORT).show();
+                            } else {
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                try {
+                                    editor.putString(Var.ACCESS_TOKEN, respond.getString(Var.ACCESS_TOKEN));
+                                    editor.commit();
+                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
-            });
-        } catch (JSONException e) {
-            e.printStackTrace();
+                });
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 

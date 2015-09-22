@@ -3,30 +3,88 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/selector_listview"
-    android:orientation="horizontal"
-    android:padding="10dp">
+    android:orientation="vertical"
+    android:paddingBottom="10dp"
+    android:paddingTop="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
 
 
-    <ImageView
-        android:id="@+id/imgDoctorAvt"
-        android:layout_width="0dp"
-        android:layout_height="60dp"
-        android:layout_weight="1"
-        android:src="@drawable/ava_bacsi" />
+        <RelativeLayout
+            android:id="@+id/bg_avt"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/avatar"
+            android:gravity="center">
 
-    <RelativeLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="3">
+            <ImageView
+                android:id="@+id/imgNotifIcon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ava_bacsi"
+                android:visibility="invisible" />
 
-        <TextView
-            android:id="@+id/txtDoctorName"
+            <TextView
+                android:id="@+id/name_avatar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="DG"
+                android:textColor="#FFFFFF"
+                android:textSize="20dp" />
+        </RelativeLayout>
+
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
-            android:text="Đến giờ uống thuốc rồi"
-            android:textSize="20dp"
-            android:textStyle="bold" />
-    </RelativeLayout>
+            android:layout_marginLeft="10dp">
+
+            <TextView
+                android:id="@+id/txtTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Đến giờ uống thuốc rồi"
+                android:textSize="16dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtTitle"
+                android:text="Hô hấp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@+id/txtType"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:background="#CCC" />
+        </RelativeLayout>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="10dp">
+
+        <TextView
+            android:id="@+id/txtBody"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/demo"
+            android:textColor="#000"
+            android:textSize="16dp" />
+    </LinearLayout>
+
+
 </LinearLayout>

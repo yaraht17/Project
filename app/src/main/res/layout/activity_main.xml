@@ -1,4 +1,4 @@
-<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
@@ -15,35 +15,19 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="65dp"
-            android:background="#158fc2"
+            android:layout_height="55dp"
+            android:background="@color/Theme1"
             android:orientation="horizontal">
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.5"
-                android:paddingBottom="20dp"
-                android:paddingLeft="14dp"
-                android:paddingRight="15dp"
-                android:paddingTop="20dp">
-
-                <Button
-                    android:id="@+id/btnMenuNavigation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:background="@drawable/selector_button_person" />
-            </LinearLayout>
 
             <com.fourlines.view.PagerSlidingTabStrip
                 android:id="@+id/tabs"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="3"
-                app:pstsDividerColor="#158fc2"
-                app:pstsIndicatorColor="#FFF"
-                app:pstsIndicatorHeight="3dp"
+                app:pstsDividerColor="@color/Theme1"
+                app:pstsIndicatorColor="@color/Theme1"
+                app:pstsIndicatorHeight="0dp"
                 app:pstsShouldExpand="true"
                 app:pstsTabPaddingLeftRight="14dp" />
 
@@ -53,19 +37,11 @@
         <android.support.v4.view.ViewPager
             android:id="@+id/viewpager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
     </LinearLayout>
 
 
-    <ListView
-        android:id="@+id/left_drawer"
-        android:layout_width="240dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:background="#324052"
-        android:choiceMode="singleChoice"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp" />
-</android.support.v4.widget.DrawerLayout>
+</LinearLayout>
 

@@ -72,7 +72,7 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
         screenHeight = displaymetrics.heightPixels;
         screenWidth = displaymetrics.widthPixels;
 
-        int cat_size = (screenWidth - 80) / 2;
+        int cat_size = (screenWidth - 10) / 2;
         sickTypeList = createSickType();
         //sickTypeAdapter = new SickTypeListAdapter(rootView.getContext(), R.layout.item_sick_type, sickTypeList);
         gridView.setAdapter(new ImageAdapter(rootView.getContext(), cat_size, sickTypeList));
@@ -162,13 +162,13 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
 
     private ArrayList<SickType> createSickType() {
         ArrayList list = new ArrayList();
-        SickType sickType = new SickType(0, R.drawable.chude1, "Hô Hấp");
+        SickType sickType = new SickType(0, R.drawable.hohap, "Hô Hấp");
         list.add(sickType);
-        list.add(new SickType(1, R.drawable.chude1, "Tuần Hoàn"));
-        list.add(new SickType(2, R.drawable.chude1, "Tiêu Hóa"));
-        list.add(new SickType(3, R.drawable.chude1, "Tiết Niệu"));
-        list.add(new SickType(4, R.drawable.chude1, "Xương Khớp"));
-        list.add(new SickType(5, R.drawable.chude1, "Thần Kinh"));
+        list.add(new SickType(1, R.drawable.tuanhoan, "Tuần Hoàn"));
+        list.add(new SickType(2, R.drawable.tieuhoa, "Tiêu Hóa"));
+        list.add(new SickType(3, R.drawable.ngoaida, "Ngoài Da"));
+        list.add(new SickType(4, R.drawable.xuongkhop, "Xương Khớp"));
+        list.add(new SickType(5, R.drawable.thankinh, "Thần Kinh"));
         return list;
 
     }

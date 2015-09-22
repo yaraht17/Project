@@ -86,7 +86,7 @@ public class ImageAdapter extends BaseAdapter {
     public void loadBitmap(int resId, ImageView imageView) {
         if (cancelPotentialWork(resId, imageView)) {
             final BitmapWorkerTask task = new BitmapWorkerTask(imageView);
-            imageView.setBackgroundResource(R.drawable.empty_photo);
+//            imageView.setBackgroundResource(R.drawable.empty_photo);
             task.execute(resId);
         }
     }

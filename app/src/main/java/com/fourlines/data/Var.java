@@ -31,4 +31,6 @@ public class Var {
     public static final String SICK_TYPE_KEY = "SICK_TYPE_KEY";
     public static final String DOCTOR_KEY = "DOCTOR_KEY";
     public static final String[] SICKTYPE = {"Hô Hấp", "Tuần Hoàn", "Tiêu Hóa", "Tiết Niệu", "Xương Khớp", "Thần Kinh"};
+
+
 }

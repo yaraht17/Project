@@ -8,16 +8,16 @@
         android:id="@+id/msgr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="35dp"
+        android:layout_toLeftOf="@+id/avatar"
         android:background="@drawable/right"
         android:paddingBottom="15dp"
-        android:paddingTop="15dp"
-        android:paddingRight="10dp"
         android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="15dp"
         android:text="Sampleright"
-        android:layout_toLeftOf="@+id/avatar"
-    	android:layout_marginLeft="30dp"
         android:textColor="#000" />
-    
+
     <ImageView
         android:id="@+id/avatar"
         android:layout_width="30dp"

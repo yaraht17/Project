@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
+    android:background="#158fc2"
     tools:context="com.fourlines.doctor.LoginActivity">
 
     <LinearLayout
@@ -14,7 +14,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="2"
+            android:layout_weight="1.5"
             android:gravity="center">
 
             <ImageView
@@ -27,59 +27,66 @@
         </RelativeLayout>
 
         <LinearLayout
+            android:id="@+id/form"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="2"
             android:orientation="vertical"
-            android:paddingBottom="40dp"
-            android:paddingLeft="30dp"
-            android:paddingRight="30dp"
-            android:paddingTop="40dp"
-            android:weightSum="2">
+            android:paddingBottom="5dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:paddingTop="45dp"
+            android:weightSum="3">
 
             <EditText
-                android:textColorHint="#FFF"
-                android:textColor="#FFF"
                 android:id="@+id/txtEmail"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:background="@drawable/txtbox"
-                android:gravity="center"
-                android:hint="Email" />
+                android:background="#FFF"
+                android:hint="Email"
+                android:paddingLeft="5dp"
+                android:textColor="#000"
+                android:textColorHint="#AAA"
+                />
 
             <EditText
-                android:textColorHint="#FFF"
-                android:textColor="#FFF"
                 android:id="@+id/txtPassword"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="20dp"
                 android:layout_weight="1"
-                android:background="@drawable/txtbox"
-                android:gravity="center"
+                android:background="#FFF"
                 android:hint="Password"
-                android:inputType="textPassword" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="2"
-            android:orientation="vertical"
-            android:paddingBottom="30dp"
-            android:paddingLeft="30dp"
-            android:paddingRight="30dp">
+                android:inputType="textPassword"
+                android:padding="5dp"
+                android:textColor="#000"
+                android:textColorHint="#AAA" />
 
             <Button
                 android:id="@+id/btnLogin"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_gravity="center"
-                android:layout_weight="0.5"
-                android:background="@drawable/btn_login" />
+                android:layout_marginTop="40dp"
+                android:layout_weight="1"
+                android:background="#004059"
+                android:text="Đăng nhập"
+                android:textColor="#FFF"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1.2"
+            android:orientation="vertical"
+            android:paddingBottom="10dp"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp">
+
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -89,27 +96,31 @@
                 android:padding="10dp">
 
                 <TextView
-                    android:id="@+id/txtRegister"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="Đăng ký"
-                    android:textStyle="bold"
-                    android:textColor="#FFF"/>
-
-                <TextView
-                    android:textColor="#FFF"
-                    android:textStyle="bold"
                     android:id="@+id/txtFogetPass"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginTop="5dp"
-                    android:text="Quên mật khẩu?" />
+                    android:layout_marginBottom="20dp"
+                    android:text="Quên mật khẩu?"
+                    android:textColor="#FFF"
+                    android:textStyle="bold" />
+
             </LinearLayout>
 
         </LinearLayout>
     </LinearLayout>
 
+
+    <TextView
+        android:id="@+id/txtRegister"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
+        android:layout_marginBottom="20dp"
+        android:text="Đăng ký"
+        android:textColor="#FFF"
+        android:textStyle="bold" />
 
 </RelativeLayout>

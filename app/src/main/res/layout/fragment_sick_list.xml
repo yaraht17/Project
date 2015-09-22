@@ -9,18 +9,19 @@
         android:id="@+id/layout_search"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="#6bcbc5"
+        android:background="@color/Theme1"
         android:orientation="horizontal"
-        android:padding="5dp">
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp">
 
         <EditText
             android:id="@+id/edt_lsf_search"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
             android:background="@drawable/txtbox_search"
-            android:hint="Search"
+            android:hint="Tìm kiếm"
             android:padding="10dp"
             android:singleLine="true" />
 
@@ -40,7 +41,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/layout_search"
-        android:background="#FFF"
+        android:background="@color/white"
         android:orientation="vertical">
 
         <include layout="@layout/grid_view" />
@@ -55,7 +56,6 @@
         android:visibility="invisible">
 
         <ListView
-
             android:id="@+id/lv_lsf_result_search"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent" />

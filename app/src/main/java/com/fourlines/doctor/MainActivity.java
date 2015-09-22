@@ -1,31 +1,22 @@
 package com.fourlines.doctor;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.ListView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.fourlines.adapter.CustomDrawerAdapter;
 import com.fourlines.adapter.TabsPagerAdapter;
 import com.fourlines.data.Data;
 import com.fourlines.data.Var;
-import com.fourlines.model.DrawerItem;
 import com.fourlines.model.MedicalHistory;
 import com.fourlines.model.UserItem;
 import com.fourlines.view.PagerSlidingTabStrip;
@@ -38,7 +29,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
@@ -47,28 +37,18 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private TabsPagerAdapter mTabsAdapter;
     private PagerSlidingTabStrip slideTabs;
-
-    //drawer
-    private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
-    private CustomDrawerAdapter drawerAdapter;
-    private List<DrawerItem> drawerDataList;
     private String accessToken;
-
+    Typeface font_awesome;
 
     SharedPreferences sharedPreferences;
-    private Button btnNavigation;
 
     private UserItem user;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
-        btnNavigation = (Button) findViewById(R.id.btnMenuNavigation);
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         slideTabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
 
@@ -90,31 +70,12 @@ public class MainActivity extends AppCompatActivity {
 
                     user = new UserItem(userItem.getId(), userItem.getEmail(), userItem.getFullname(), userItem.getList());
                     Data.user = user;
-                    drawerDataList = initDrawerData(user);
-                    drawerAdapter = new CustomDrawerAdapter(getApplicationContext(), R.layout.custom_drawer_item,
-                            drawerDataList);
-                    mDrawerList.setAdapter(drawerAdapter);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
         });
 
-
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        // set up the drawer's list view with items and click listener
-
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-//        if (savedInstanceState == null) {
-//            selectItem(0);
-//        }
-
-        btnNavigation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mDrawerLayout.openDrawer(Gravity.LEFT);
-            }
-        });
 
         mTabsAdapter = new TabsPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(mTabsAdapter);
@@ -126,57 +87,10 @@ public class MainActivity extends AppCompatActivity {
             viewPager.setCurrentItem(Integer.parseInt(getIntent().getStringExtra("Page")));
         }
         slideTabs.setViewPager(viewPager);
+//        slideTabs.setTextColorResource(R.color.white);
+//        font_awesome = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
+//        slideTabs.setTypeface(font_awesome, Typeface.NORMAL);
 
-
-    }
-
-
-    private ArrayList initDrawerData(UserItem user) {
-        ArrayList list = new ArrayList();
-        list.add(new DrawerItem(user.getFullname(), "Tiểu đường", R.drawable.avatar_user));
-        list.add(new DrawerItem("Chỉnh sửa thông tin", R.string.user_icon));
-        list.add(new DrawerItem("Thông báo mới", R.string.notif_icon));
-        list.add(new DrawerItem("Cài đặt", R.string.settings_icon));
-        list.add(new DrawerItem("Đăng xuất", R.string.logout_icon));
-        return list;
-    }
-
-
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Intent intent;
-            switch (position) {
-                case 0:
-                    intent = new Intent(getApplicationContext(), UserProfileActivity.class);
-                    startActivity(intent);
-                    break;
-                case 1:
-                    intent = new Intent(getApplicationContext(), UserProfileActivity.class);
-                    startActivity(intent);
-                    break;
-                case 2:
-                    intent = new Intent(getApplicationContext(), NotificationActivity.class);
-                    startActivity(intent);
-                    break;
-                case 3:
-                    intent = new Intent(getApplicationContext(), SettingsActivity.class);
-                    startActivity(intent);
-                    break;
-                case 4:
-                    //logout
-                    logout(accessToken, new VolleyCallback() {
-                        @Override
-                        public void onSuccess(JSONObject respond) {
-                            sharedPreferences.edit().remove(Var.ACCESS_TOKEN).commit();
-                            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                            startActivity(intent);
-                            finish();
-                        }
-                    });
-            }
-
-        }
     }
 
     public void logout(final String accessToken, final VolleyCallback callback) {
