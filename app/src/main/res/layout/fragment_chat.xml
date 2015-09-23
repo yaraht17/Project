@@ -55,7 +55,7 @@
             android:layout_weight="1"
             android:background="@null"
             android:hint="@string/txt_hint_message_frament_chat"
-            android:inputType="textCapSentences"
+            android:inputType="text|textMultiLine|textCapSentences"
             android:padding="5dp" />
 
         <TextView

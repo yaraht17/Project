@@ -44,6 +44,7 @@ public class SickListActivity extends AppCompatActivity implements AdapterView.O
     private ProgressBar progressBar;
     private TextView txtSickListName;
     private SwipeRefreshLayout swipeContainer;
+    private int index;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,13 +59,13 @@ public class SickListActivity extends AppCompatActivity implements AdapterView.O
         btnBack.setOnClickListener(this);
         sickListView.setOnItemClickListener(this);
 
-        int index = getIntent().getExtras().getInt(Var.SICK_TYPE_KEY);
+        index = getIntent().getExtras().getInt(Var.SICK_TYPE_KEY);
         txtSickListName.setText(Var.SICKTYPE[index]);
 
         sickList = new ArrayList<>();
-        if (Data.sickList != null) {
+        if (Data.sicks[index] != null) {
             progressBar.setVisibility(View.GONE);
-            sickList = Data.sickList;
+            sickList = Data.sicks[index];
             sickListAdapter = new SickListAdapter(getApplicationContext(), R.layout.item_sick_list, sickList);
             sickListView.setAdapter(sickListAdapter);
         } else {
@@ -78,7 +79,7 @@ public class SickListActivity extends AppCompatActivity implements AdapterView.O
             @Override
             public void onRefresh() {
                 progressBar.setVisibility(View.GONE);
-                sickListAdapter.clear();
+
 
                 (new SickAsynTask()).execute();
             }
@@ -113,14 +114,15 @@ public class SickListActivity extends AppCompatActivity implements AdapterView.O
         protected List<SickItem> doInBackground(Void... params) {
             ArrayList list = new ArrayList();
             try {
-                getSick("all", "", new VolleyCallback() {
+                getSick("type", Var.SICKTYPE[index], new VolleyCallback() {
 
                     //wait request success
                     @Override
                     public void onSuccess(JSONObject response) {
                         Log.d("TienDH", response.toString());
+                        sickListAdapter.clear();
                         sickList = convertResponseToArray(response);
-                        Data.sickList = sickList;
+                        Data.sicks[index] = sickList;
                         swipeContainer.setRefreshing(false);
 //                        sickListAdapter.setSickList(sickList);
 //                        sickListAdapter.notifyDataSetChanged();
@@ -207,10 +209,10 @@ public class SickListActivity extends AppCompatActivity implements AdapterView.O
                 JSONArray array = response.getJSONArray("data");
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject object = array.getJSONObject(i);
-                    final SickItem sickItem = new SickItem(object.getString(Var.ID), object.getString(Var.SICK_NAME), object.getString(Var.SICK_TYPE),
-                            object.getString(Var.SICK_REASON), convertToList(object.getJSONArray(Var.SICK_FOODS)),
-                            convertToList(object.getJSONArray(Var.SICK_BAN_FOODS)),
-                            convertToList(object.getJSONArray(Var.SICK_SYMPTOMS)));
+                    final SickItem sickItem = new SickItem(object.getString(Var.ID), object.getString(Var.SICK_NAME),
+                            object.getString(Var.SICK_TYPE), object.getString(Var.SICK_REASON), object.getString(Var.SICK_FOODS),
+                            object.getString(Var.SICK_BAN_FOODS), convertToList(object.getJSONArray(Var.SICK_SYMPTOMS)),
+                            object.getString(Var.SICK_TREATMENT), object.getString(Var.SICK_DESCRIPTION), object.getString(Var.SICK_PREVENTION));
                     list.add(sickItem);
                     Log.d("TienDH", sickItem.getName());
                     runOnUiThread(new Runnable() {

@@ -44,9 +44,9 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage> {
         row.setTag(viewHolder);
         viewHolder.message.setText(chatMessageObj.message);
         if (chatMessageObj.left == true) {
-            viewHolder.avatar.setImageResource(R.drawable.ic_doctor);
+            viewHolder.avatar.setImageResource(R.drawable.bacsi);
         } else {
-            viewHolder.avatar.setImageResource(R.drawable.avatar_user);
+            viewHolder.avatar.setImageResource(R.drawable.benhnhan);
         }
         return row;
     }

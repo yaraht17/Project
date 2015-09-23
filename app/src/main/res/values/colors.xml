@@ -3,7 +3,9 @@
     <color name="Theme">#158fc2</color>
     <color name="Theme2">#1380ae</color>
     <color name="Theme1">#004059</color>
-
+    <!--<color name="Theme1">#34495e</color>-->
+    <color name="Theme3">#1ABC9C</color>
     <color name="background">#bbcacb</color>
     <color name="white">#FFF</color>
+    <color name="grey">#95a5a6</color>
 </resources>

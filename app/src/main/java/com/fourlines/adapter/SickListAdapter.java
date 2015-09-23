@@ -65,18 +65,21 @@ public class SickListAdapter extends ArrayAdapter<SickItem> {
             viewHolder.sickName = (TextView) row
                     .findViewById(R.id.txt_sick_name);
             viewHolder.img = (ImageView) row.findViewById(R.id.img_sick_avatar);
+            viewHolder.des = (TextView) row.findViewById(R.id.txtDescription);
             row.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) row.getTag();
         }
         viewHolder.sickName.setText(item.getName());
         viewHolder.img.setImageResource(R.drawable.avatar_sick);
+        viewHolder.des.setText(item.getDescription());
         return row;
     }
 
     private class ViewHolder {
         TextView sickName;
         ImageView img;
+        TextView des;
     }
 
     public void filter(String charText) {

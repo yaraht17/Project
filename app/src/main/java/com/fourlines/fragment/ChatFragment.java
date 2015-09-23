@@ -1,6 +1,7 @@
 package com.fourlines.fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -37,10 +39,17 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
     private ArrayList<ChatMessage> items = new ArrayList<ChatMessage>();
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_chat,
                 container, false);
+
         font_awesome = Typeface.createFromAsset(rootView.getContext().getAssets(), "fontawesome-webfont.ttf");
         imgSend = (TextView) rootView.findViewById(R.id.btnSendMess);
         imgVoice = (TextView) rootView.findViewById(R.id.btnVoice);
@@ -52,12 +61,33 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
         imgVoice.setTypeface(font_awesome);
 
 
+        chatText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    hideKeyboard();
+                }
+            }
+
+            private void hideKeyboard() {
+                if (chatText != null) {
+                    InputMethodManager imanager = (InputMethodManager) getActivity()
+                            .getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imanager.hideSoftInputFromWindow(chatText.getWindowToken(), 0);
+
+                }
+
+            }
+        });
+
         chatAdapter = new ChatAdapter(rootView.getContext(),
                 R.layout.item_chat_right, items);
         listView.setAdapter(chatAdapter);
         imgSend.setOnClickListener(this);
         imgVoice.setOnClickListener(this);
         return rootView;
+
+
     }
 
     private void sendChatMessage(String message) {// add message to list view

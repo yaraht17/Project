@@ -2,47 +2,48 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="#bbcacb"
+    android:orientation="vertical"
     tools:context="com.fourlines.doctor.SickDetailActivity">
 
-    <!--<LinearLayout-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="60dp"-->
-    <!--android:background="#158fc2"-->
-    <!--android:orientation="horizontal">-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/Theme1"
+        android:orientation="horizontal">
 
-    <!--<Button-->
-    <!--android:id="@+id/btnBack"-->
-    <!--android:layout_width="60dp"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:layout_gravity="center"-->
-    <!--android:background="@drawable/btn_back" />-->
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="@drawable/btn_back" />
 
 
-    <!--<TextView-->
-    <!--android:id="@+id/txtSickListName"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_gravity="center"-->
-    <!--android:text="List Bệnh"-->
-    <!--android:textColor="#FFF"-->
-    <!--android:textSize="20dp"-->
-    <!--android:textStyle="bold" />-->
+        <TextView
+            android:id="@+id/txtSickListName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Chi tiết"
+            android:textColor="#FFF"
+            android:textSize="20dp"
+            android:textStyle="bold" />
 
-    <!--</LinearLayout>-->
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#00AFF0"
+        android:background="@color/white"
         android:orientation="horizontal"
-        android:padding="40dp">
+        android:padding="10dp">
 
         <ImageView
             android:id="@+id/imageSick"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
             android:src="@drawable/avatar_sick" />
 
         <RelativeLayout
@@ -58,7 +59,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:text="Bệnh Bla Bla"
-                android:textColor="#FFF"
                 android:textSize="20dp"
                 android:textStyle="bold" />
 
@@ -69,7 +69,6 @@
                 android:layout_alignParentRight="true"
                 android:layout_below="@+id/sickName"
                 android:text="Loại bệnh"
-                android:textColor="#FFF"
                 android:textSize="20dp" />
         </RelativeLayout>
     </LinearLayout>

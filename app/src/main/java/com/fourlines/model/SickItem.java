@@ -9,11 +9,15 @@ public class SickItem implements Serializable {
     private String image;
     private String type;
     private String reason;
-    private ArrayList<String> foods;
-    private ArrayList<String> banFoods;
+    private String foods;
+    private String banFoods;
     private ArrayList<String> symptoms;
+    private String treatment;
+    private String description;
+    private String prevention;
 
-    public SickItem(String id, String name, String type, String reason, ArrayList<String> foods, ArrayList<String> banFoods, ArrayList<String> symptoms) {
+    public SickItem(String id, String name, String type, String reason,
+                    String foods, String banFoods, ArrayList<String> symptoms, String treatment, String description, String prevention) {
         this.id = id;
         this.name = name;
         this.type = type;
@@ -21,9 +25,13 @@ public class SickItem implements Serializable {
         this.foods = foods;
         this.banFoods = banFoods;
         this.symptoms = symptoms;
+        this.treatment = treatment;
+        this.prevention = prevention;
+        this.description = description;
     }
 
-    public SickItem(String id, String name, String image, String type, String reason, ArrayList<String> foods, ArrayList<String> banFoods, ArrayList<String> symptoms) {
+    public SickItem(String id, String name, String image, String type, String reason,
+                    String foods, String banFoods, ArrayList<String> symptoms, String treatment, String description, String prevention) {
         this.id = id;
         this.name = name;
         this.image = image;
@@ -32,6 +40,25 @@ public class SickItem implements Serializable {
         this.foods = foods;
         this.banFoods = banFoods;
         this.symptoms = symptoms;
+        this.treatment = treatment;
+        this.prevention = prevention;
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getPrevention() {
+        return prevention;
+    }
+
+    public void setPrevention(String prevention) {
+        this.prevention = prevention;
     }
 
     public String getId() {
@@ -74,19 +101,19 @@ public class SickItem implements Serializable {
         this.reason = reason;
     }
 
-    public ArrayList<String> getFoods() {
+    public String getFoods() {
         return foods;
     }
 
-    public void setFoods(ArrayList<String> foods) {
+    public void setFoods(String foods) {
         this.foods = foods;
     }
 
-    public ArrayList<String> getBanFoods() {
+    public String getBanFoods() {
         return banFoods;
     }
 
-    public void setBanFoods(ArrayList<String> banFoods) {
+    public void setBanFoods(String banFoods) {
         this.banFoods = banFoods;
     }
 
@@ -96,5 +123,13 @@ public class SickItem implements Serializable {
 
     public void setSymptoms(ArrayList<String> symptoms) {
         this.symptoms = symptoms;
+    }
+
+    public String getTreatment() {
+        return treatment;
+    }
+
+    public void setTreatment(String treatment) {
+        this.treatment = treatment;
     }
 }

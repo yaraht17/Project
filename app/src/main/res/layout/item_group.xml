@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_group"
+    android:background="@color/Theme1"
     android:orientation="vertical"
     android:padding="10dp">
 
@@ -18,10 +18,10 @@
         android:textSize="20dp" />
 
     <ImageView
-        android:layout_centerVertical="true"
         android:id="@+id/imageStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
         android:src="@drawable/open" />
 </RelativeLayout>

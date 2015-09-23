@@ -1,5 +1,6 @@
 package com.fourlines.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
@@ -54,11 +56,14 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
     private View rootView;
     private int screenWidth, screenHeight;
 
+//
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_sick_list,
                 container, false);
+
         edtSearchSick = (EditText) rootView.findViewById(R.id.edt_lsf_search);
         imgClearText = (ImageView) rootView.findViewById(R.id.img_lsf_remove_text);
         listResultSearch = (ListView) rootView.findViewById(R.id.lv_lsf_result_search);
@@ -66,7 +71,24 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
         layoutResult = (RelativeLayout) rootView.findViewById(R.id.layout_result_search);
         gridView = (GridView) rootView.findViewById(R.id.sickTypeList);
 
+        edtSearchSick.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    hideKeyboard();
+                }
+            }
+
+            private void hideKeyboard() {
+                if (edtSearchSick != null) {
+                    InputMethodManager imanager = (InputMethodManager) getActivity()
+                            .getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imanager.hideSoftInputFromWindow(edtSearchSick.getWindowToken(), 0);
+
+                }
+
+            }
+        });
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         screenHeight = displaymetrics.heightPixels;
@@ -74,7 +96,6 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
 
         int cat_size = (screenWidth - 10) / 2;
         sickTypeList = createSickType();
-        //sickTypeAdapter = new SickTypeListAdapter(rootView.getContext(), R.layout.item_sick_type, sickTypeList);
         gridView.setAdapter(new ImageAdapter(rootView.getContext(), cat_size, sickTypeList));
         imgClearText.setOnClickListener(this);
         gridView.setOnItemClickListener(this);
@@ -94,6 +115,8 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
             e.printStackTrace();
         }
         action();
+
+
         return rootView;
     }
 
@@ -108,11 +131,7 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
             public void onItemClick(AdapterView<?> arg0, View arg1,
                                     int arg2, long arg3) {
                 sendSickDetail(sickResultItems.get(arg2), rootView);// send
-                // id
-                // sick
-                // item to sick
-                // detail
-                // activity
+
             }
         });
         edtSearchSick.addTextChangedListener(new TextWatcher() {
@@ -138,7 +157,6 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
                     layoutMenu.setVisibility(RelativeLayout.VISIBLE);
                     layoutResult.setVisibility(RelativeLayout.INVISIBLE);
                 } else {
-//                    sickResultItems = loadData();
 //                    adapterSickList = new SickListAdapter(rootView.getContext(),
 //                            R.layout.fragment_sick_list, sickResultItems);
 //                    listResultSearch.setAdapter(adapterSickList);
@@ -153,6 +171,14 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
 
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        InputMethodManager imanager = (InputMethodManager) getActivity()
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        imanager.hideSoftInputFromWindow(edtSearchSick.getWindowToken(), 0);
+    }
+
     private void intentAction(int index) {
         Intent intent = new Intent(rootView.getContext(),
                 SickListActivity.class);
@@ -162,8 +188,7 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
 
     private ArrayList<SickType> createSickType() {
         ArrayList list = new ArrayList();
-        SickType sickType = new SickType(0, R.drawable.hohap, "Hô Hấp");
-        list.add(sickType);
+        list.add(new SickType(0, R.drawable.hohap, "Hô Hấp"));
         list.add(new SickType(1, R.drawable.tuanhoan, "Tuần Hoàn"));
         list.add(new SickType(2, R.drawable.tieuhoa, "Tiêu Hóa"));
         list.add(new SickType(3, R.drawable.ngoaida, "Ngoài Da"));
@@ -177,13 +202,6 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
         Intent intent = new Intent(rootView.getContext(), SickDetailActivity.class);
         intent.putExtra(Var.SICK_KEY, item);
         startActivity(intent);
-    }
-
-    public ArrayList<SickItem> loadData() {// load data sick to
-        // server
-        ArrayList<SickItem> items = new ArrayList<>();
-        items = Data.sickListAll;
-        return items;
     }
 
     @Override

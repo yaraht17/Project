@@ -10,7 +10,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.fourlines.data.Var;
+import com.fourlines.model.MedicalHistory;
 import com.fourlines.model.SickItem;
+import com.fourlines.model.UserItem;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -91,10 +93,10 @@ public class ConnectServer {
             JSONArray array = response.getJSONArray("data");
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                final SickItem sickItem = new SickItem(object.getString(Var.ID), object.getString(Var.SICK_NAME), object.getString(Var.SICK_TYPE),
-                        object.getString(Var.SICK_REASON), convertToList(object.getJSONArray(Var.SICK_FOODS)),
-                        convertToList(object.getJSONArray(Var.SICK_BAN_FOODS)),
-                        convertToList(object.getJSONArray(Var.SICK_SYMPTOMS)));
+                final SickItem sickItem = new SickItem(object.getString(Var.ID), object.getString(Var.SICK_NAME),
+                        object.getString(Var.SICK_TYPE), object.getString(Var.SICK_REASON), object.getString(Var.SICK_FOODS),
+                        object.getString(Var.SICK_BAN_FOODS), convertToList(object.getJSONArray(Var.SICK_SYMPTOMS)),
+                        object.getString(Var.SICK_TREATMENT), object.getString(Var.SICK_DESCRIPTION), object.getString(Var.SICK_PREVENTION));
                 list.add(sickItem);
                 Log.d("TienDH", sickItem.getName());
 //                mActivity.runOnUiThread(new Runnable() {
@@ -109,6 +111,73 @@ public class ConnectServer {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        return list;
+    }
+
+    public void logout(final String accessToken, final VolleyCallback callback) {
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.GET, Var.URL_LOGOUT, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        callback.onSuccess(response);
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("LinhTh", error.toString());
+                    }
+                }) {
+            @Override
+            public Map getHeaders() throws AuthFailureError {
+                Map headers = new HashMap();
+                headers.put("Authorization", "access_token " + accessToken);
+                return headers;
+            }
+        };
+        MySingleton.getInstance(context).addToRequestQueue(jsObjRequest);
+    }
+
+    public void getDataAccount(final String accessToken, final VolleyCallback callback) {
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.GET, Var.URL_GET_DATA_ACCOUNT, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        callback.onSuccess(response);
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("LinhTh", error.toString());
+                    }
+                }) {
+            @Override
+            public Map getHeaders() throws AuthFailureError {
+                Map headers = new HashMap();
+                headers.put("Authorization", "access_token " + accessToken);
+                return headers;
+            }
+        };
+        MySingleton.getInstance(context).addToRequestQueue(jsObjRequest);
+    }
+
+    public UserItem responseToObject(JSONObject response) throws JSONException {
+
+        JSONObject object = response.getJSONObject("result");
+        String id = object.getString(Var.ID);
+        String email = object.getString(Var.EMAIL);
+        String fullname = object.getString(Var.FULLNAME);
+        JSONArray array = object.getJSONArray(Var.SICKS);
+        UserItem data = new UserItem(id, email, fullname, arrayToArraylist(array));
+
+        return data;
+    }
+
+    public ArrayList<MedicalHistory> arrayToArraylist(JSONArray array) {
+        ArrayList<MedicalHistory> list = new ArrayList<>();
         return list;
     }
 }
