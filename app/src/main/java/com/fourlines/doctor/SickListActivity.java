@@ -119,7 +119,6 @@ public class SickListActivity extends AppCompatActivity implements AdapterView.O
                     //wait request success
                     @Override
                     public void onSuccess(JSONObject response) {
-                        Log.d("TienDH", response.toString());
                         sickListAdapter.clear();
                         sickList = convertResponseToArray(response);
                         Data.sicks[index] = sickList;
@@ -164,7 +163,6 @@ public class SickListActivity extends AppCompatActivity implements AdapterView.O
 
                         @Override
                         public void onResponse(JSONObject response) {
-                            Log.d("TienDH", "onRes : " + response.toString());
                             callback.onSuccess(response);
 
                         }

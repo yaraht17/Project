@@ -7,7 +7,7 @@ public class NotificationItem {
     private String body;
     private String topic;
 
-    public NotificationItem(String id, int imgID, String title, String time, String body, String topic) {
+    public NotificationItem(String id, int imgID, String title, String body, String topic) {
         this.id = id;
         this.imgID = imgID;
         this.title = title;

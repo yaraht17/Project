@@ -75,14 +75,15 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="5dp">
+        android:layout_height="match_parent"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp">
 
         <ExpandableListView
             android:id="@+id/sickDetail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:dividerHeight="2dp"
+            android:dividerHeight="1dp"
             android:groupIndicator="@null" />
 
     </LinearLayout>

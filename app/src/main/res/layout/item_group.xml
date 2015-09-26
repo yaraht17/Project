@@ -15,7 +15,7 @@
         android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft"
         android:text="Click Me!!"
         android:textColor="#FFF"
-        android:textSize="20dp" />
+        android:textSize="18dp" />
 
     <ImageView
         android:id="@+id/imageStatus"

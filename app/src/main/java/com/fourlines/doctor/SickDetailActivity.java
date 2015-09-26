@@ -81,7 +81,7 @@ public class SickDetailActivity extends AppCompatActivity implements View.OnClic
         List<ItemDetail> symptons = new ArrayList<ItemDetail>();
         for (String s : sickItem.getSymptoms()) {
             s = Character.toUpperCase(s.charAt(0)) + s.substring(1);
-            symptons.add(new ItemDetail(s, ""));
+            symptons.add(new ItemDetail("", s));
         }
 
         listDataChild.put(listDataHeader.get(0), reason); // Header, Child data

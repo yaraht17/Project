@@ -48,7 +48,6 @@ public class ConnectServer {
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.d("TienDH", "onRes : " + response.toString());
                         callback.onSuccess(response);
 
                     }
@@ -166,12 +165,19 @@ public class ConnectServer {
 
     public UserItem responseToObject(JSONObject response) throws JSONException {
 
-        JSONObject object = response.getJSONObject("result");
-        String id = object.getString(Var.ID);
-        String email = object.getString(Var.EMAIL);
-        String fullname = object.getString(Var.FULLNAME);
-        JSONArray array = object.getJSONArray(Var.SICKS);
-        UserItem data = new UserItem(id, email, fullname, arrayToArraylist(array));
+        JSONObject object = null;
+        String id = null;
+        String email = null;
+        JSONArray array = null;
+        String fullname = null;
+        String avatarUrl = null;
+        object = response.getJSONObject("result");
+        id = object.getString(Var.ID);
+        email = object.getString(Var.EMAIL);
+        array = object.getJSONArray(Var.SICKS);
+        fullname = object.getString(Var.FULLNAME);
+        avatarUrl = object.getString(Var.AVATAR);
+        UserItem data = new UserItem(id, email, fullname, avatarUrl, arrayToArraylist(array));
 
         return data;
     }

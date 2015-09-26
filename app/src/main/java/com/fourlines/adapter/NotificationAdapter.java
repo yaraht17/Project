@@ -18,15 +18,13 @@ import java.util.List;
 import java.util.Locale;
 
 public class NotificationAdapter extends ArrayAdapter<NotificationItem> {
-
-    private Context context;
     private int resource;
+    private Context context;
     private ViewHolder viewHolder;
     private LayoutInflater inflater;
     private List<NotificationItem> notifList = new ArrayList<NotificationItem>();
 
-    public NotificationAdapter(Context context, int resource,
-                               ArrayList<NotificationItem> notifs) {
+    public NotificationAdapter(Context context, int resource, ArrayList<NotificationItem> notifs) {
         super(context, resource, notifs);
         this.context = context;
         this.resource = resource;
@@ -73,9 +71,9 @@ public class NotificationAdapter extends ArrayAdapter<NotificationItem> {
 
         viewHolder.topic.setText(item.getTopic());
 
-        if (item.getImgID() == 0) {
-
+        if (item.getImgID() == 0 && !item.getTitle().equals("")) {
             String name = item.getTitle();
+            name = name.trim();
             String name_split[] = name.split(" ");
             int l = name_split.length;
             if (l >= 2) {
@@ -94,6 +92,7 @@ public class NotificationAdapter extends ArrayAdapter<NotificationItem> {
 
         return row;
     }
+
 
     private class ViewHolder {
         TextView title, topic, body;

@@ -21,6 +21,7 @@
         android:layout_height="match_parent">
 
         <LinearLayout
+            android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
@@ -34,14 +35,18 @@
                 android:orientation="horizontal"
                 android:padding="10dp">
 
-                <ImageView
+                <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/imageUser"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:src="@drawable/benhnhan" />
+                    android:gravity="center"
+                    android:src="@drawable/benhnhan"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1dp" />
 
                 <RelativeLayout
+
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
@@ -54,24 +59,22 @@
                         android:id="@+id/userName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Xuân Tùng"
                         android:textSize="16dp"
                         android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/ageUser"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/userName"
-                        android:text="22 tuổi"
-                        android:textSize="16dp" />
 
                     <TextView
                         android:id="@+id/emailUser"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/ageUser"
-                        android:text="xuantung@15cm.com"
+                        android:layout_below="@+id/userName"
+                        android:textSize="16dp" />
+
+                    <TextView
+                        android:id="@+id/ageUser"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/emailUser"
                         android:textSize="16dp" />
                 </RelativeLayout>
             </LinearLayout>

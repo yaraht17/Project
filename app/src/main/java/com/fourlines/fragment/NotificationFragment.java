@@ -7,7 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
+import android.widget.AbsListView;
 import android.widget.ProgressBar;
 
 import com.android.volley.AuthFailureError;
@@ -20,6 +20,7 @@ import com.fourlines.data.Data;
 import com.fourlines.data.Var;
 import com.fourlines.doctor.R;
 import com.fourlines.model.NotificationItem;
+import com.fourlines.view.EndlessListView;
 import com.fourlines.volley.MySingleton;
 import com.fourlines.volley.VolleyCallback;
 
@@ -31,15 +32,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NotificationFragment extends Fragment {
+public class NotificationFragment extends Fragment implements EndlessListView.EndlessListener {
 
 
     private ArrayList<NotificationItem> notifList;
-    private ListView notifListView;
+    private EndlessListView notifListView;
     private NotificationAdapter notifListAdapter;
     private View rootView;
     private ProgressBar progressBar;
     private SwipeRefreshLayout swipeContainer;
+    private int page;
+    private boolean flagScroll = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,31 +56,38 @@ public class NotificationFragment extends Fragment {
 
         rootView = inflater.inflate(R.layout.fragment_notification,
                 container, false);
-
-        notifListView = (ListView) rootView.findViewById(R.id.listNotif);
+        page = 1;
+        notifListView = (EndlessListView) rootView.findViewById(R.id.listNotif);
         progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
         swipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainer);
-        loading();
+
+        notifListView.setLoadingView(R.layout.progress_bar_footer);
+        notifListView.setListener(this); //listen for a scroll movement to the bottom
 
         notifList = new ArrayList<>();
+        notifListAdapter = new NotificationAdapter(rootView.getContext(), R.layout.item_notif, notifList);
+        notifListView.setAdapter(notifListAdapter);
+        //kiem tra list da dc luu chua;
         if (Data.notifList != null) {
             progressBar.setVisibility(View.GONE);
             notifList = Data.notifList;
             notifListAdapter = new NotificationAdapter(rootView.getContext(), R.layout.item_notif, notifList);
             notifListView.setAdapter(notifListAdapter);
         } else {
-            loading();
+            //chua thi load server
+            loading(String.valueOf(page));
         }
 
-
-        notifListAdapter = new NotificationAdapter(rootView.getContext(), R.layout.item_notif, notifList);
-        notifListView.setAdapter(notifListAdapter);
+        //init
 
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 progressBar.setVisibility(View.GONE);
-                loading();
+                flagScroll = false;
+                notifListView.setListener(NotificationFragment.this);
+                page = 1;
+                loading(String.valueOf(page));
             }
         });
 
@@ -89,28 +99,50 @@ public class NotificationFragment extends Fragment {
         return rootView;
     }
 
-    private void loading() {
-        getNotif("1", new VolleyCallback() {
+    private void loading(String page) {
+        getNotif(page, new VolleyCallback() {
             @Override
             public void onSuccess(JSONObject respond) {
-                notifListAdapter.clear();
+                if (flagScroll == true) {
+                    notifListView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_DISABLED);
+                } else {
+                    notifListView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_NORMAL);
+                    notifListAdapter.clear();
+                }
                 progressBar.setVisibility(View.GONE);
                 swipeContainer.setRefreshing(false);
-                notifList = convertResponseToArray(respond);
-                Data.notifList = notifList;
-                notifListAdapter = new NotificationAdapter(rootView.getContext(), R.layout.item_notif, notifList);
-                notifListView.setAdapter(notifListAdapter);
+                ArrayList newData = convertResponseToArray(respond);
+                if (newData != null) {
+                    //notifListAdapter.clear();
+//                    notifList.addAll(newData);
+
+                    notifListView.addNewData(newData);
+                    Data.notifList = notifList;
+                } else {
+                    Log.d("TienDH", "WTF");
+//                    try {
+//                        Thread.sleep(1000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    notifListView.setIsLoading(false);
+                    notifListView.removeLoadingView();
+//                    notifListView.setListener(null);
+//                    notifListView.setOnScrollListener(null);
+//                    notifList = Data.notifList;
+//                    notifListView.addNewData(notifList);
+                }
             }
         });
     }
 
     public void getNotif(String page, final VolleyCallback callback) {
+        Log.d("TienDH", "Page :" + page);
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, Var.URL_GET_TIPS + page, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.d("TienDH", "onRes : " + response.toString());
                         callback.onSuccess(response);
 
                     }
@@ -132,19 +164,26 @@ public class NotificationFragment extends Fragment {
         MySingleton.getInstance(getContext()).addToRequestQueue(jsObjRequest);
     }
 
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        notifListAdapter = new NotificationAdapter(rootView.getContext(), R.layout.item_notif, notifList);
+//        notifListView.setAdapter(notifListAdapter);
+//    }
+
     //convert json object to array list
     public ArrayList<NotificationItem> convertResponseToArray(JSONObject response) {
         ArrayList<NotificationItem> list = new ArrayList<>();
-
         try {
             JSONArray array = response.getJSONArray("data");
+            if (array.length() == 0) {
+                return null;
+            }
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
-                final NotificationItem item = new NotificationItem(object.getString(Var.ID),
-                        0, object.getString(Var.NOTIF_TITLE),
-                        object.getString(Var.NOTIF_TOPIC), object.getString(Var.NOTIF_CONTENT), object.getString(Var.NOTIF_TOPIC));
+                final NotificationItem item = new NotificationItem(object.getString(Var.ID), 0,
+                        object.getString(Var.NOTIF_TITLE), object.getString(Var.NOTIF_CONTENT), object.getString(Var.NOTIF_TOPIC));
                 list.add(item);
-                Log.d("TienDH", item.getTitle());
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -153,4 +192,15 @@ public class NotificationFragment extends Fragment {
     }
 
 
+    @Override
+    public void loadData() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        flagScroll = true;
+        page++;
+        loading(String.valueOf(page));
+    }
 }

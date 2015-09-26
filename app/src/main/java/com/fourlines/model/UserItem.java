@@ -7,12 +7,14 @@ public class UserItem implements Serializable {
     private String id;
     private String email;
     private String fullname;
+    private String avatarUrl;
     private ArrayList<MedicalHistory> list;
 
-    public UserItem(String id, String email, String fullname, ArrayList<MedicalHistory> list) {
+    public UserItem(String id, String email, String fullname, String avatarUrl, ArrayList<MedicalHistory> list) {
         this.id = id;
         this.email = email;
         this.fullname = fullname;
+        this.avatarUrl = avatarUrl;
         this.list = list;
     }
 
@@ -22,6 +24,13 @@ public class UserItem implements Serializable {
         this.fullname = fullname;
     }
 
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
 
     public String getId() {
         return id;
