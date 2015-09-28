@@ -41,7 +41,7 @@ public class Var {
     public static final String URL_LOGOUT = URL_HOST + "/api/v1/logout";
     public static final String URL_GET_TIPS = URL_HOST + "/api/v1/tips?page=";
     public static final String URL_SEND_QUESTION = URL_HOST + "/api/v1/question?question=";
-
+    public static final String URL_SEND_SICK = URL_HOST + "/api/v1/sicks/push";
     public static final String CHAT_STATUS = "status";
     public static final String CHAT_TYPE = "type";
     public static final String CHAT_DATA = "data";
@@ -60,5 +60,7 @@ public class Var {
             "Tôi không biết đâu", "Nói chuyện khác đi bạn"};
 
     public static final String INTERNET_CHECK = "internet_check";
+
+    public static final String SICKNAMETOSERVER = "sickName";
 
 }

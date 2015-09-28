@@ -443,4 +443,36 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
                 break;
         }
     }
+
+    public void sendSickToServer(final String sickName, final VolleyCallback callback) throws JSONException {
+
+        final JSONObject jsonBody = new JSONObject();
+        jsonBody.put(Var.SICKNAMETOSERVER, sickName);
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.POST, Var.URL_SEND_SICK, jsonBody, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        callback.onSuccess(response);
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("LinhTh", error.toString());
+                    }
+                }) {
+            @Override
+            public Map getHeaders() throws AuthFailureError {
+                Map headers = new HashMap();
+                headers.put("Authorization", "access_token " + accessToken);
+                return headers;
+            }
+        };
+        MySingleton.getInstance(getContext()).addToRequestQueue(jsObjRequest);
+    }
+
 }
+
+
+

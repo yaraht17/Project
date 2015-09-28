@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
@@ -34,7 +35,6 @@ import com.fourlines.adapter.InfoAdapter;
 import com.fourlines.connection.ConnectionDetector;
 import com.fourlines.data.Data;
 import com.fourlines.data.DatabaseChat;
-import com.fourlines.data.Result;
 import com.fourlines.data.DatabaseNotif;
 import com.fourlines.data.Var;
 import com.fourlines.doctor.R;
@@ -48,13 +48,14 @@ import com.fourlines.volley.MySingleton;
 import com.fourlines.volley.VolleyCallback;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.Scopes;
-import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.samsung.android.sdk.healthdata.HealthConnectionErrorResult;
 import com.samsung.android.sdk.healthdata.HealthConstants;
+import com.samsung.android.sdk.healthdata.HealthDataObserver;
+import com.samsung.android.sdk.healthdata.HealthDataResolver;
 import com.samsung.android.sdk.healthdata.HealthDataService;
 import com.samsung.android.sdk.healthdata.HealthDataStore;
 import com.samsung.android.sdk.healthdata.HealthPermissionManager;
@@ -72,7 +73,9 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -84,11 +87,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
     public static final String APP_TAG = "SimpleHealth";
     private final int MENU_ITEM_PERMISSION_SETTING = 1;
 
-    private static Fragment mInstance = null;
     private HealthDataStore mStore;
     private HealthConnectionErrorResult mConnError;
     private Set<HealthPermissionManager.PermissionKey> mKeySet;
-    private Result mReporter;
+    private ArrayList<String> listStepCount = new ArrayList<>();
 
     private static final String TAG = "TienDH";
     private View rootView;
@@ -107,16 +109,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
     private TextView txtUserName, txtAge, txtEmail;
     private LinearLayout content;
     private ImageView imageProfile;
-    /* Request code used to invoke sign in user interactions. */
     private static final int RC_SIGN_IN = 9001;
-
-    /* Client used to interact with Google APIs. */
     private GoogleApiClient mGoogleApiClient;
-    private SignInButton btnLoginGoogle;
-    /* Is there a ConnectionResult resolution in progress? */
     private boolean mIsResolving = false;
 
-    /* Should we automatically resolve ConnectionResults when possible? */
     private boolean mShouldResolve = false;
 
     private Map<String, String> listData = new HashMap<>();
@@ -143,7 +139,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
         iconLogout.setTypeface(font_awesome);
         iconLogout.setText(getString(R.string.logout));
 
-        mInstance = this;
         mKeySet = new HashSet<HealthPermissionManager.PermissionKey>();
         mKeySet.add(new HealthPermissionManager.PermissionKey(HealthConstants.StepCount.HEALTH_DATA_TYPE,
                 HealthPermissionManager.PermissionType.READ));
@@ -213,13 +208,21 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
         return rootView;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Create a HealthDataStore instance and set its listener
+        mStore = new HealthDataStore(getContext(), mConnectionListener);
+        // Request the connection to the health data store
+        mStore.connectService();
+    }
+
     private final HealthDataStore.ConnectionListener mConnectionListener = new HealthDataStore.ConnectionListener() {
 
         @Override
         public void onConnected() {
             Log.d(APP_TAG, "Health data service is connected.");
             HealthPermissionManager pmsManager = new HealthPermissionManager(mStore);
-            mReporter = new Result(mStore);
 
             try {
                 // Check whether the permissions that this application needs are acquired
@@ -230,7 +233,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
                     pmsManager.requestPermissions(mKeySet).setResultListener(mPermissionListener);
                 } else {
                     // Get the current step count and display it
-                    mReporter.start();
+                    start();
                 }
             } catch (Exception e) {
                 Log.e(APP_TAG, e.getClass().getName() + " - " + e.getMessage());
@@ -259,43 +262,39 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
                     Map<HealthPermissionManager.PermissionKey, Boolean> resultMap = result.getResultMap();
 
                     if (resultMap.containsValue(Boolean.FALSE)) {
-                        drawStepCount("");
+                        drawCalo("");
                         drawHeartRate("");
                         drawHeightWeight("");
                         showPermissionAlarmDialog();
                     } else {
                         // Get the current step count and display it
-                        mReporter.start();
+                        start();
                     }
                 }
             };
 
-    public void drawStepCount(String count) {
-
-        infoList.add(new InfoItem(getString(R.string.foot), "Số bước chân: " + count));
+    public void drawCalo(String count) {
+        Log.d("TienDH", "so buoc chan: " + count);
+        infoList.add(new InfoItem(getString(R.string.foot), "Calo tiêu thụ: " + count + " Cal"));
         infoAdapter = new InfoAdapter(rootView.getContext(), R.layout.item_info, infoList);
         infoListView.setAdapter(infoAdapter);
-
     }
 
     public void drawHeartRate(String count) {
-
-        infoList.add(new InfoItem(getString(R.string.heart), "Nhịp tim: " + count));
+        Log.d("TienDH", "nhip tim: " + count);
+        infoList.add(new InfoItem(getString(R.string.heart), "Nhịp tim: " + count + " bpm"));
         infoAdapter = new InfoAdapter(rootView.getContext(), R.layout.item_info, infoList);
         infoListView.setAdapter(infoAdapter);
     }
 
     public void drawHeightWeight(String count) {
+        Log.d("TienDH", "cc+ cn: " + count);
         String s[] = count.split("-");
-        infoList.add(new InfoItem(getString(R.string.height), "Chiều cao: " + s[0]));
-        infoList.add(new InfoItem(getString(R.string.weight), "Cân nặng: " + s[1]));
+        infoList.add(new InfoItem(getString(R.string.height), "Chiều cao: " + s[0] + " cm"));
+        infoList.add(new InfoItem(getString(R.string.weight), "Cân nặng: " + s[1] + " kg"));
         infoList.add(new InfoItem(getString(R.string.bmi), "BMI: " + s[2]));
         infoAdapter = new InfoAdapter(rootView.getContext(), R.layout.item_info, infoList);
         infoListView.setAdapter(infoAdapter);
-    }
-
-    public static Fragment getInstance() {
-        return mInstance;
     }
 
     private void showPermissionAlarmDialog() {
@@ -567,7 +566,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
         @Override
         protected void onPostExecute(Bitmap result) {
             imageProfile.setImageBitmap(result);
-            storeImage(result, "avatar");
+            storeImage(result, "avatar.png");
         }
 
         // Creates Bitmap from InputStream and returns it
@@ -619,7 +618,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
         sdIconStorageDir.mkdirs();
 
         try {
-            String filePath = sdIconStorageDir.toString() + filename;
+            String filePath = sdIconStorageDir.toString() + "/" + filename;
             FileOutputStream fileOutputStream = new FileOutputStream(filePath);
             BufferedOutputStream bos = new BufferedOutputStream(fileOutputStream);
 
@@ -659,4 +658,170 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
         });
         builder.create().show();
     }
+
+    public void start() {
+        // Register an observer to listen changes of step count and get today step count
+        HealthDataObserver.addObserver(mStore, HealthConstants.StepCount.HEALTH_DATA_TYPE, mObserver);
+        HealthDataObserver.addObserver(mStore, HealthConstants.HeartRate.HEALTH_DATA_TYPE, mObserver);
+        HealthDataObserver.addObserver(mStore, HealthConstants.Weight.HEALTH_DATA_TYPE, mObserver);
+        readWeightAndHeight();
+        readHeartRate();
+        readDailyCalo(0, 0);
+    }
+
+    private void readHeartRate() {
+        HealthDataResolver resolver = new HealthDataResolver(mStore, null);
+
+        HealthDataResolver.ReadRequest request = new HealthDataResolver.ReadRequest.Builder()
+                .setDataType(HealthConstants.HeartRate.HEALTH_DATA_TYPE)
+                .setProperties(new String[]{HealthConstants.HeartRate.HEART_RATE})
+                .setFilter(null)
+                .build();
+
+        try {
+            resolver.read(request).setResultListener(mListenerHeartRate);
+        } catch (Exception e) {
+            Log.e("LinhTh", e.getClass().getName() + " - " + e.getMessage());
+        }
+    }
+
+    private void readWeightAndHeight() {
+        HealthDataResolver resolver = new HealthDataResolver(mStore, null);
+
+        HealthDataResolver.ReadRequest request = new HealthDataResolver.ReadRequest.Builder()
+                .setDataType(HealthConstants.Weight.HEALTH_DATA_TYPE)
+                .setProperties(new String[]{HealthConstants.Weight.HEIGHT, HealthConstants.Weight.WEIGHT})
+                .setFilter(null)
+                .build();
+
+        try {
+            resolver.read(request).setResultListener(mListenerWeightHeight);
+        } catch (Exception e) {
+            Log.e("LinhTh", e.getClass().getName() + " - " + e.getMessage());
+        }
+    }
+
+    private long getStartTimeOfToday() {
+        Calendar today = Calendar.getInstance();
+
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+
+        return today.getTimeInMillis();
+    }
+
+    private final HealthResultHolder.ResultListener<HealthDataResolver.ReadResult> mListenerWeightHeight =
+            new HealthResultHolder.ResultListener<HealthDataResolver.ReadResult>() {
+                @Override
+                public void onResult(HealthDataResolver.ReadResult result) {
+                    Cursor c = null;
+                    int height = 0;
+                    int weight = 0;
+                    double bmi = 0;
+                    try {
+                        c = result.getResultCursor();
+                        if (c != null) {
+                            while (c.moveToNext()) {
+                                height = c.getInt(c.getColumnIndex(HealthConstants.Weight.HEIGHT));
+                                weight = c.getInt(c.getColumnIndex(HealthConstants.Weight.WEIGHT));
+                                double tmp = (double) height / 100;
+                                bmi = (double) weight / (tmp * tmp);
+                                DecimalFormat df = new DecimalFormat("0.00");
+                                String str = df.format(bmi);
+                                bmi = Double.valueOf(str);
+                            }
+                        }
+                    } finally {
+                        if (c != null) {
+                            c.close();
+                        }
+                    }
+                    drawHeightWeight(String.valueOf(height) + "-" +
+                            String.valueOf(weight) + "-" + String.valueOf(bmi));
+                }
+            };
+
+
+    private final HealthResultHolder.ResultListener<HealthDataResolver.ReadResult> mListenerHeartRate =
+            new HealthResultHolder.ResultListener<HealthDataResolver.ReadResult>() {
+                @Override
+                public void onResult(HealthDataResolver.ReadResult result) {
+                    int count = 0;
+                    Cursor c = null;
+                    try {
+                        c = result.getResultCursor();
+                        if (c != null) {
+                            while (c.moveToNext()) {
+                                count = c.getInt(c.getColumnIndex(HealthConstants.HeartRate.HEART_RATE));
+                            }
+                        }
+                    } finally {
+                        if (c != null) {
+                            c.close();
+                        }
+                    }
+                    drawHeartRate(String.valueOf(count));
+                }
+            };
+
+    private final HealthDataObserver mObserver = new HealthDataObserver(null) {
+
+        // Update the step count when a change event is received
+        @Override
+        public void onChange(String dataTypeName) {
+            Log.d("LinhTh", "Observer receives a data changed event");
+            readDailyCalo(0, 0);
+            readWeightAndHeight();
+            readHeartRate();
+        }
+    };
+
+    private void readDailyCalo(long from, long to) {
+        Log.d("TienDH", "start count ");
+        HealthDataResolver resolver = new HealthDataResolver(mStore, null);
+        HealthDataResolver.AggregateRequest request = new HealthDataResolver.AggregateRequest.Builder()
+                .setDataType(HealthConstants.StepCount.HEALTH_DATA_TYPE)
+                .addFunction(HealthDataResolver.AggregateRequest.AggregateFunction.SUM, HealthConstants.StepCount.CALORIE, "average")
+                .setTimeGroup(HealthDataResolver.AggregateRequest.TimeGroupUnit.DAILY, 1, HealthConstants.StepCount.START_TIME,
+                        HealthConstants.StepCount.TIME_OFFSET, "days")
+                .build();
+        try {
+            resolver.aggregate(request).setResultListener(mAggregateResultListener);
+        } catch (Exception e) {
+// Error handling
+            e.printStackTrace();
+            Log.e("TienDH", "count failed ");
+        }
+    }
+
+    int a_count = 0;
+    private final HealthResultHolder.ResultListener<HealthDataResolver.AggregateResult> mAggregateResultListener = new
+            HealthResultHolder.ResultListener<HealthDataResolver.AggregateResult>() {
+                @Override
+                public void onResult(HealthDataResolver.AggregateResult result) {
+// Check and get result
+                    if (HealthResultHolder.BaseResult.STATUS_SUCCESSFUL == result.getStatus()) {
+                        Cursor c = null;
+                        try {
+                            c = result.getResultCursor();
+                            if (c != null) {
+                                while (c.moveToNext()) {
+                                    int col_num = c.getColumnCount();
+                                    String days = c.getString(c.getColumnIndex("days"));
+                                    String average = c.getString(c.getColumnIndex("average"));
+                                    listStepCount.add(average);
+                                }
+                            }
+                        } finally {
+                            if (c != null) {
+                                c.close();
+                            }
+                        }
+                        drawCalo(listStepCount.get(listStepCount.size() - 2));
+                        listStepCount = new ArrayList<>();
+                    }
+                }
+            };
 }

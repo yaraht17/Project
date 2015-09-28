@@ -297,7 +297,7 @@ public class SqlashScreen extends AppCompatActivity implements
             Log.d(TAG, "get token");
             String accountName = Plus.AccountApi.getAccountName(mGoogleApiClient);
             Account account = new Account(accountName, GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
-            String scopes = "audience:server:client_id:" + SERVER_CLIENT_ID_RELEASE; // Not the app's client ID.
+            String scopes = "audience:server:client_id:" + SERVER_CLIENT_ID; // Not the app's client ID.
             try {
                 return GoogleAuthUtil.getToken(getApplicationContext(), account, scopes);
             } catch (IOException e) {
@@ -361,6 +361,7 @@ public class SqlashScreen extends AppCompatActivity implements
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.d("LinhTh", error.toString());
+                        onRestart();
                     }
                 });
         MySingleton.getInstance(this).addToRequestQueue(jsObjRequest);

@@ -97,6 +97,19 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
         gridView.setAdapter(new ImageAdapter(rootView.getContext(), cat_size, sickTypeList));
         imgClearText.setOnClickListener(this);
         gridView.setOnItemClickListener(this);
+        if (Data.sickList != null) {
+            sickResultItems = Data.sickList;
+            adapterSickList = new SickListAdapter(rootView.getContext(),
+                    R.layout.fragment_sick_list, sickResultItems);
+            listResultSearch.setAdapter(adapterSickList);
+        } else {
+            loading();
+        }
+        action();
+        return rootView;
+    }
+
+    private void loading() {
         final ConnectServer con = new ConnectServer(getContext());
         if (ConnectionDetector.isNetworkConnected(rootView.getContext())) {
             try {
@@ -114,23 +127,15 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
                 e.printStackTrace();
             }
         }
-        action();
-
-
-        return rootView;
     }
 
     public void action() {
-        listResultSearch.setOnItemClickListener(new OnItemClickListener() {// action
-            // when
-            // click
-            // item in
-            // listview
+        listResultSearch.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1,
                                     int arg2, long arg3) {
-                sendSickDetail(sickResultItems.get(arg2), rootView);// send
+                sendSickDetail(adapterSickList.getItem(arg2), rootView);// send
 
             }
         });
@@ -160,6 +165,10 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
                         alertConnection.setVisibility(View.VISIBLE);
                         mHandler.postDelayed(delay, 6 * 1000);
                     }
+                    if (sickResultItems != null) {
+                        adapterSickList.setSickList(sickResultItems);
+                        adapterSickList.filter(text);
+                    }
                     imgClearText.setVisibility(ImageView.VISIBLE);
                     layoutResult.setVisibility(RelativeLayout.VISIBLE);
                     layoutMenu.setVisibility(RelativeLayout.INVISIBLE);
@@ -167,7 +176,6 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
                 }
             }
         });
-
     }
 
     @Override

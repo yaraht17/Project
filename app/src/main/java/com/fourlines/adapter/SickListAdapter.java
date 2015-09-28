@@ -22,6 +22,7 @@ public class SickListAdapter extends ArrayAdapter<SickItem> {
     private ViewHolder viewHolder;
     private LayoutInflater inflater;
     private List<SickItem> sickList = new ArrayList<SickItem>();
+    private List<SickItem> worldpopulationlist = new ArrayList<SickItem>();
 
     public SickListAdapter(Context context, int resource,
                            ArrayList<SickItem> sickItems) {
@@ -29,7 +30,10 @@ public class SickListAdapter extends ArrayAdapter<SickItem> {
         this.context = context;
         this.resource = resource;
         this.sickList = sickItems;
+        worldpopulationlist.addAll(sickItems);
+
     }
+
 
     public List<SickItem> getSickList() {
         return sickList;
@@ -41,12 +45,12 @@ public class SickListAdapter extends ArrayAdapter<SickItem> {
 
     @Override
     public int getCount() {
-        return sickList.size();
+        return worldpopulationlist.size();
     }
 
     @Override
     public SickItem getItem(int position) {
-        return sickList.get(position);
+        return worldpopulationlist.get(position);
     }
 
     @Override
@@ -82,16 +86,47 @@ public class SickListAdapter extends ArrayAdapter<SickItem> {
         TextView des;
     }
 
+//    public void filter(String charText) {
+//        try {
+//            charText = URLEncoder.encode(charText, "utf-8");
+//            charText = charText.toLowerCase(Locale.getDefault());
+//            //sickList.clear();
+//            ArrayList<SickItem> listTmp = new ArrayList<>();
+//
+//
+//            Log.d("TienDH", "size: " + sickList.size());
+//            for (SickItem wp : sickList) {
+//                String sickName = wp.getName();
+//                sickName = URLEncoder.encode(sickName, "utf-8");
+//                Log.d("TienDH", sickName);
+//                if (sickName.toLowerCase(Locale.getDefault()).contains(
+//                        charText)) {
+//                    listTmp.add(wp);
+//
+//                }
+//            }
+//
+//            sickList.clear();
+//            if (listTmp != null) {
+//                sickList.addAll(listTmp);
+//            }
+//            notifyDataSetChanged();
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+//
+//    }
+
     public void filter(String charText) {
         charText = charText.toLowerCase(Locale.getDefault());
-        sickList.clear();
+        worldpopulationlist.clear();
         if (charText.length() == 0) {
-            sickList.addAll(sickList);
+            worldpopulationlist.addAll(sickList);
         } else {
             for (SickItem wp : sickList) {
                 if (wp.getName().toLowerCase(Locale.getDefault()).contains(
                         charText)) {
-                    sickList.add(wp);
+                    worldpopulationlist.add(wp);
                 }
             }
         }
