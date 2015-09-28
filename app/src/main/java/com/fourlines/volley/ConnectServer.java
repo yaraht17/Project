@@ -3,6 +3,7 @@ package com.fourlines.volley;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -49,14 +50,13 @@ public class ConnectServer {
                     @Override
                     public void onResponse(JSONObject response) {
                         callback.onSuccess(response);
-
                     }
                 }, new Response.ErrorListener() {
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.d("TienDH", "Res Error" + error.toString());
-
+                        Toast.makeText(context, "Xảy ra lỗi, vui lòng thử lại", Toast.LENGTH_SHORT).show();
                     }
                 }) {
             @Override
@@ -80,7 +80,6 @@ public class ConnectServer {
                 e.printStackTrace();
             }
         }
-
         return list;
     }
 
@@ -97,15 +96,6 @@ public class ConnectServer {
                         object.getString(Var.SICK_BAN_FOODS), convertToList(object.getJSONArray(Var.SICK_SYMPTOMS)),
                         object.getString(Var.SICK_TREATMENT), object.getString(Var.SICK_DESCRIPTION), object.getString(Var.SICK_PREVENTION));
                 list.add(sickItem);
-                Log.d("TienDH", sickItem.getName());
-//                mActivity.runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        sickListAdapter.add(sickItem);
-//                        sickListAdapter.notifyDataSetChanged();
-//                        sickListView.setAdapter(sickListAdapter);
-//                    }
-//                });
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -126,6 +116,7 @@ public class ConnectServer {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.d("LinhTh", error.toString());
+                        Toast.makeText(context, "Xảy ra lỗi, vui lòng thử lại", Toast.LENGTH_SHORT).show();
                     }
                 }) {
             @Override
@@ -151,6 +142,7 @@ public class ConnectServer {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.d("LinhTh", error.toString());
+                        Toast.makeText(context, "Xảy ra lỗi, vui lòng thử lại", Toast.LENGTH_SHORT).show();
                     }
                 }) {
             @Override
@@ -163,7 +155,7 @@ public class ConnectServer {
         MySingleton.getInstance(context).addToRequestQueue(jsObjRequest);
     }
 
-    public UserItem responseToObject(JSONObject response) throws JSONException {
+    public UserItem responseToObject(JSONObject response) {
 
         JSONObject object = null;
         String id = null;
@@ -171,12 +163,26 @@ public class ConnectServer {
         JSONArray array = null;
         String fullname = null;
         String avatarUrl = null;
-        object = response.getJSONObject("result");
-        id = object.getString(Var.ID);
-        email = object.getString(Var.EMAIL);
-        array = object.getJSONArray(Var.SICKS);
-        fullname = object.getString(Var.FULLNAME);
-        avatarUrl = object.getString(Var.AVATAR);
+        try {
+            object = response.getJSONObject("result");
+            id = object.getString(Var.ID);
+            email = object.getString(Var.EMAIL);
+            array = object.getJSONArray(Var.SICKS);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        try {
+            fullname = object.getString(Var.FULLNAME);
+        } catch (JSONException e) {
+            fullname = null;
+//            e.printStackTrace();
+        }
+        try {
+            avatarUrl = object.getString(Var.AVATAR);
+        } catch (JSONException e) {
+            avatarUrl = null;
+//            e.printStackTrace();
+        }
         UserItem data = new UserItem(id, email, fullname, avatarUrl, arrayToArraylist(array));
 
         return data;

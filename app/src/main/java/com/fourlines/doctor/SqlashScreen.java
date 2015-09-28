@@ -8,9 +8,15 @@ import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -19,6 +25,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.fourlines.connection.ConnectionDetector;
 import com.fourlines.data.Var;
+import com.fourlines.model.UserItem;
 import com.fourlines.volley.ConnectServer;
 import com.fourlines.volley.MySingleton;
 import com.fourlines.volley.VolleyCallback;
@@ -44,6 +51,7 @@ public class SqlashScreen extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener,
         View.OnClickListener {
     private static final String SERVER_CLIENT_ID = "191481179195-a0i8umlb5o1bl1dc8r878mh91hdnul4f.apps.googleusercontent.com";
+    private static final String SERVER_CLIENT_ID_RELEASE = "964990600722-klf8e112gbegu2iefcpfsp46qf4ikkhi.apps.googleusercontent.com";
     private SharedPreferences sharedPreferences;
     private static final String TAG = "TienDH";
     /* Request code used to invoke sign in user interactions. */
@@ -60,13 +68,16 @@ public class SqlashScreen extends AppCompatActivity implements
     private static final String KEY_IS_RESOLVING = "is_resolving";
     private static final String KEY_SHOULD_RESOLVE = "should_resolve";
     private String accessToken;
-    private ConnectionDetector connectionDetector;
+    private ImageView imageLogo;
+    private LinearLayout layoutLogo;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sqlash_screen);
-        connectionDetector = new ConnectionDetector(this);
+        imageLogo = (ImageView) findViewById(R.id.logo);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -75,29 +86,39 @@ public class SqlashScreen extends AppCompatActivity implements
                 .build();
         btnLoginGoogle = (SignInButton) findViewById(R.id.sign_in_button);
         btnLoginGoogle.setOnClickListener(this);
+        setGooglePlusButtonText(btnLoginGoogle, "Đăng nhập bằng Google");
+        layoutLogo = (LinearLayout) findViewById(R.id.logoLayout);
         sharedPreferences = getSharedPreferences(Var.MY_PREFERENCES, Context.MODE_PRIVATE);
         accessToken = sharedPreferences.getString(Var.ACCESS_TOKEN, "");
-        checkLogin();
+//        checkLogin();
 
+        Thread background = new Thread() {
+            public void run() {
+                try {
+                    // Thread will sleep for 2 seconds
+                    sleep(1 * 1000);
 
-//        Thread background = new Thread() {
-//            public void run() {
-//                try {
-//                    // Thread will sleep for 2 seconds
-//                    sleep(2 * 1000);
-//                    checkLogin();
-//                    // Remove activity
-//                    finish();
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        };
-//        background.start();
-
+                    checkLogin();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        background.start();
         if (savedInstanceState != null) {
             mIsResolving = savedInstanceState.getBoolean(KEY_IS_RESOLVING);
             mShouldResolve = savedInstanceState.getBoolean(KEY_SHOULD_RESOLVE);
+        }
+    }
+
+    protected void setGooglePlusButtonText(SignInButton signInButton, String buttonText) {
+        for (int i = 0; i < signInButton.getChildCount(); i++) {
+            View v = signInButton.getChildAt(i);
+            if (v instanceof TextView) {
+                TextView mTextView = (TextView) v;
+                mTextView.setText(buttonText);
+                return;
+            }
         }
     }
 
@@ -109,13 +130,9 @@ public class SqlashScreen extends AppCompatActivity implements
     }
 
     public void checkLogin() {
-
-
         if (!accessToken.equals("")) {
             //co token
-            if (connectionDetector.isNetworkConnected()) {
-
-
+            if (ConnectionDetector.isNetworkConnected(getApplicationContext())) {
                 final ConnectServer con = new ConnectServer(this);
                 con.getDataAccount(accessToken, new VolleyCallback() {
                     @Override
@@ -124,9 +141,15 @@ public class SqlashScreen extends AppCompatActivity implements
                             if (respond.getString("status").equals("fail")) {
                                 //sai token
                                 sharedPreferences.edit().remove(Var.ACCESS_TOKEN).commit();
+
                                 showLogin();
                             } else {
                                 //dung token
+                                UserItem userItem = con.responseToObject(respond);
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString(Var.FULLNAME, userItem.getFullname());
+                                editor.putString(Var.EMAIL, userItem.getEmail());
+                                editor.commit();
                                 showSignedInUI();
                             }
                         } catch (JSONException e) {
@@ -145,10 +168,13 @@ public class SqlashScreen extends AppCompatActivity implements
 
     private void showLogin() {
 
-        btnLoginGoogle.setVisibility(View.VISIBLE);
+        layoutLogo.animate().translationY(-300).setDuration(500).setInterpolator(new AccelerateDecelerateInterpolator());
+        mHandler.postDelayed(delay, 1 * 1000);
     }
 
+
     private void showSignedInUI() {
+
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
@@ -201,7 +227,7 @@ public class SqlashScreen extends AppCompatActivity implements
     }
 
     private void onSignInClicked() {
-        if (connectionDetector.isNetworkConnected()) {
+        if (ConnectionDetector.isNetworkConnected(getApplicationContext())) {
             mShouldResolve = true;
             mGoogleApiClient.connect();
         } else {
@@ -211,8 +237,6 @@ public class SqlashScreen extends AppCompatActivity implements
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-
-
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
 
         if (!mIsResolving && mShouldResolve) {
@@ -229,9 +253,9 @@ public class SqlashScreen extends AppCompatActivity implements
                 showErrorDialog(connectionResult);
             }
         } else {
-            if (!mGoogleApiClient.isConnected()) {
-                btnLoginGoogle.setVisibility(View.VISIBLE);
-            }
+//            if (!mGoogleApiClient.isConnected()) {
+//                btnLoginGoogle.setVisibility(View.VISIBLE);
+//            }
         }
     }
 
@@ -273,7 +297,7 @@ public class SqlashScreen extends AppCompatActivity implements
             Log.d(TAG, "get token");
             String accountName = Plus.AccountApi.getAccountName(mGoogleApiClient);
             Account account = new Account(accountName, GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
-            String scopes = "audience:server:client_id:" + SERVER_CLIENT_ID; // Not the app's client ID.
+            String scopes = "audience:server:client_id:" + SERVER_CLIENT_ID_RELEASE; // Not the app's client ID.
             try {
                 return GoogleAuthUtil.getToken(getApplicationContext(), account, scopes);
             } catch (IOException e) {
@@ -348,4 +372,12 @@ public class SqlashScreen extends AppCompatActivity implements
             mGoogleApiClient.disconnect();
         }
     }
+
+    Handler mHandler = new Handler();
+
+    private Runnable delay = new Runnable() {
+        public void run() {
+            btnLoginGoogle.setVisibility(View.VISIBLE);
+        }
+    };
 }

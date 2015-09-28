@@ -47,17 +47,18 @@ public class Var {
     public static final String CHAT_DATA = "data";
     public static final String CHAT_RESULT = "result";
 
-    private final static int ITEM_PER_REQUEST = 10;
 
     public static final String SICK_KEY = "SICK_KEY";
     public static final String SICK_TYPE_KEY = "SICK_TYPE_KEY";
     public static final String[] SICKTYPE = {"Hô hấp", "Tuần hoàn", "Tiêu hóa", "Ngoài da", "Xương khớp", "Thần kinh"};
-    public static final String SERVER_CLIENT_ID = "";
     public static int drawList[] = {R.drawable.avatar, R.drawable.avatar1, R.drawable.avatar2,
             R.drawable.avatar4, R.drawable.avatar5, R.drawable.avatar3};
     public static final String[] TRUE = {"có", "vâng", "đúng", "chuẩn", "ừ", "hơi hơi", "thỉnh thoảng", "hay bị"};
     public static final String[] FALSE = {"không", "chưa"};
     public static final String[] QUESTION_RADOM = {"bạn có bị", "bạn bị", "bạn thấy", "bạn cảm thấy"};
-    public static final String[] ANSWER_RADOM = {"Bạn đang nói gì vậy? Tôi chẳng hiểu", "tôi chẳng hiểu bạn đang nói gì", "Tôi không biết đâu", "Nói chuyện khác đi bạn"};
+    public static final String[] ANSWER_RADOM = {"Bạn đang nói gì vậy? Tôi chẳng hiểu", "tôi chẳng hiểu bạn đang nói gì",
+            "Tôi không biết đâu", "Nói chuyện khác đi bạn"};
+
+    public static final String INTERNET_CHECK = "internet_check";
 
 }

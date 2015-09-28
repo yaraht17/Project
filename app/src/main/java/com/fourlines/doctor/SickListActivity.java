@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -19,6 +20,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.fourlines.adapter.SickListAdapter;
+import com.fourlines.connection.ConnectionDetector;
 import com.fourlines.data.Data;
 import com.fourlines.data.Var;
 import com.fourlines.model.SickItem;
@@ -45,11 +47,13 @@ public class SickListActivity extends AppCompatActivity implements AdapterView.O
     private TextView txtSickListName;
     private SwipeRefreshLayout swipeContainer;
     private int index;
+    private LinearLayout alertConnection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sick_list);
+        alertConnection = (LinearLayout) findViewById(R.id.alertConnection);
         sickListView = (ListView) findViewById(R.id.listSick);
         btnBack = (Button) findViewById(R.id.btnBack);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -62,6 +66,7 @@ public class SickListActivity extends AppCompatActivity implements AdapterView.O
         index = getIntent().getExtras().getInt(Var.SICK_TYPE_KEY);
         txtSickListName.setText(Var.SICKTYPE[index]);
 
+        Log.d("TienDH", getLocalClassName());
         sickList = new ArrayList<>();
         if (Data.sicks[index] != null) {
             progressBar.setVisibility(View.GONE);
@@ -69,7 +74,14 @@ public class SickListActivity extends AppCompatActivity implements AdapterView.O
             sickListAdapter = new SickListAdapter(getApplicationContext(), R.layout.item_sick_list, sickList);
             sickListView.setAdapter(sickListAdapter);
         } else {
-            (new SickAsynTask()).execute();
+            if (ConnectionDetector.isNetworkConnected(this)) {
+
+                (new SickAsynTask()).execute();
+            } else {
+                alertConnection.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
+            }
+
         }
 
         sickListAdapter = new SickListAdapter(getApplicationContext(), R.layout.item_sick_list, sickList);
@@ -79,9 +91,14 @@ public class SickListActivity extends AppCompatActivity implements AdapterView.O
             @Override
             public void onRefresh() {
                 progressBar.setVisibility(View.GONE);
+                if (ConnectionDetector.isNetworkConnected(getApplicationContext())) {
+                    (new SickAsynTask()).execute();
 
+                } else {
+                    alertConnection.setVisibility(View.VISIBLE);
+                    swipeContainer.setRefreshing(false);
+                }
 
-                (new SickAsynTask()).execute();
             }
         });
 
@@ -228,4 +245,5 @@ public class SickListActivity extends AppCompatActivity implements AdapterView.O
             return list;
         }
     }
+
 }

@@ -32,4 +32,6 @@
     <string name="search">&#xf002;</string>
 
     <string name="demo">Bệnh thận thường diễn biến âm thầm nên có khi phát hiện được bệnh thì đã ở giai đoạn suy thận và cần phải tiến hành sự điều trị phức tạp hơn…Bệnh thận đôi khi là do vi khuẩn streptocoques gây nên. Nhưng thông thường là do những bệnh ảnh hưởng đến thành mạch máu làm tổn hại đến thận, như bệnh cao huyết áp và bệnh đái tháo đường</string>
+    <string name="nosick">Chưa phát hiện bệnh, hãy nhờ bác sĩ tư vấn</string>
+    <string name="nointernet">Kết nối internet để cập nhật</string>
 </resources>

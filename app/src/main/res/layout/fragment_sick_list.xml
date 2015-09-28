@@ -74,4 +74,18 @@
     <!--android:text="@string/search"-->
     <!--android:textColor="#fff"-->
     <!--android:textSize="20dp" />-->
+    <LinearLayout
+        android:id="@+id/alertConnection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/alert"
+        android:gravity="center"
+        android:padding="5dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Không có kết nối" />
+    </LinearLayout>
 </RelativeLayout>

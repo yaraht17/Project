@@ -24,6 +24,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.fourlines.adapter.ChatAdapter;
+import com.fourlines.connection.ConnectionDetector;
 import com.fourlines.data.DatabaseChat;
 import com.fourlines.data.Var;
 import com.fourlines.doctor.R;
@@ -129,89 +130,96 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
         items.add(new ChatMessage(lastId, false, message));
         addMessgeToDb(new ChatMessage(lastId, false, message));
         loadChatAdapter();
-        if (sickList.size() == 0) {
-            try {
-                getMessageDoctor(message, new VolleyCallback() {
-                    @Override
-                    public void onSuccess(JSONObject respond) {
-                        try {
-                            if (respond.getString(Var.CHAT_STATUS).equals("success")) {
-                                JSONObject object = respond.getJSONObject(Var.CHAT_RESULT);
-                                if (object.getInt(Var.CHAT_TYPE) == 1) {
-                                    questionStart = message.toLowerCase();
-                                    sickList = convertResponseToArray(object);
-                                    if (sickList.size() != 0) {
-                                        while (true) {
-                                            symptom = sickList.get(locationSick).getSymptoms().get(locationSymptom);
-                                            if (questionStart.indexOf(symptom) == -1) {
-                                                createQuestion();
-                                                break;
-                                            } else {
-                                                locationSymptom++;
-                                                countYesSick++;
-                                                check();
+        if (ConnectionDetector.isNetworkConnected(getContext())) {
+            if (sickList.size() == 0) {
+                try {
+                    getMessageDoctor(message, new VolleyCallback() {
+                        @Override
+                        public void onSuccess(JSONObject respond) {
+                            try {
+                                if (respond.getString(Var.CHAT_STATUS).equals("success")) {
+                                    JSONObject object = respond.getJSONObject(Var.CHAT_RESULT);
+                                    if (object.getInt(Var.CHAT_TYPE) == 1) {
+                                        questionStart = message.toLowerCase();
+                                        sickList = convertResponseToArray(object);
+                                        if (sickList.size() != 0) {
+                                            while (true) {
+                                                symptom = sickList.get(locationSick).getSymptoms().get(locationSymptom);
+                                                if (questionStart.indexOf(symptom) == -1) {
+                                                    createQuestion();
+                                                    break;
+                                                } else {
+                                                    locationSymptom++;
+                                                    countYesSick++;
+                                                    check();
+                                                }
                                             }
+                                        } else {
+                                            lastId++;
+                                            items.add(new ChatMessage(lastId, true, Var.ANSWER_RADOM[random(Var.ANSWER_RADOM.length)]));
+                                            addMessgeToDb(new ChatMessage(lastId, true, Var.ANSWER_RADOM[random(Var.ANSWER_RADOM.length)]));
                                         }
+                                    } else if (object.getInt(Var.CHAT_TYPE) == 2) {
+                                        lastId++;
+                                        addMessgeToDb(new ChatMessage(lastId, true, object.getString(Var.CHAT_DATA)));
+                                        items.add(new ChatMessage(lastId, true, object.getString(Var.CHAT_DATA)));
                                     } else {
                                         lastId++;
-                                        items.add(new ChatMessage(lastId, true, Var.ANSWER_RADOM[random(Var.ANSWER_RADOM.length)]));
-                                        addMessgeToDb(new ChatMessage(lastId, true, Var.ANSWER_RADOM[random(Var.ANSWER_RADOM.length)]));
+                                        addMessgeToDb(new ChatMessage(lastId, true, object.getString(Var.CHAT_DATA)));
+                                        items.add(new ChatMessage(lastId, true, object.getString(Var.CHAT_DATA)));
                                     }
-                                } else if (object.getInt(Var.CHAT_TYPE) == 2) {
-                                    lastId++;
-                                    addMessgeToDb(new ChatMessage(lastId, true, object.getString(Var.CHAT_DATA)));
-                                    items.add(new ChatMessage(lastId, true, object.getString(Var.CHAT_DATA)));
-                                } else {
-                                    lastId++;
-                                    addMessgeToDb(new ChatMessage(lastId, true, object.getString(Var.CHAT_DATA)));
-                                    items.add(new ChatMessage(lastId, true, object.getString(Var.CHAT_DATA)));
+                                    loadChatAdapter();
                                 }
-                                loadChatAdapter();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
-                    }
-                });
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-        } else {
-            int tam = 0;
-            for (int i = 0; i < Var.TRUE.length; i++) {
-                if (message.toLowerCase().indexOf(Var.TRUE[i]) != -1) {
-                    countYesSick++;
-                    questionStart += " " + symptom;
-                    tam = 1;
-                    break;
+                    });
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
                 }
-            }
-            if (tam == 0) {
-                for (int i = 0; i < Var.FALSE.length; i++) {
-                    if (message.toLowerCase().indexOf(Var.FALSE[i]) != -1) {
-                        tam = 1;
-                        countNoSick++;
+            } else {
+                int tam = 0;
+                for (int i = 0; i < Var.TRUE.length; i++) {
+                    if (message.toLowerCase().indexOf(Var.TRUE[i]) != -1) {
+                        countYesSick++;
                         questionStart += " " + symptom;
-                        nextSick(countNoSick);
+                        tam = 1;
                         break;
                     }
                 }
                 if (tam == 0) {
-                    lastId++;
-                    addMessgeToDb(new ChatMessage(lastId, true, "Bạn nên trả lời đúng vào chủ đề của câu hỏi"));
-                    items.add(new ChatMessage(lastId, true, "Bạn nên trả lời đúng vào chủ đề của câu hỏi"));
+                    for (int i = 0; i < Var.FALSE.length; i++) {
+                        if (message.toLowerCase().indexOf(Var.FALSE[i]) != -1) {
+                            tam = 1;
+                            countNoSick++;
+                            questionStart += " " + symptom;
+                            nextSick(countNoSick);
+                            break;
+                        }
+                    }
+                    if (tam == 0) {
+                        lastId++;
+                        addMessgeToDb(new ChatMessage(lastId, true, "Bạn nên trả lời đúng vào chủ đề của câu hỏi"));
+                        items.add(new ChatMessage(lastId, true, "Bạn nên trả lời đúng vào chủ đề của câu hỏi"));
+                    } else {
+                        locationSymptom++;
+                        check();
+                    }
                 } else {
                     locationSymptom++;
                     check();
                 }
-            } else {
-                locationSymptom++;
-                check();
+                if (sickList.size() != 0) {
+                    createQuestion();
+                    loadChatAdapter();
+                }
             }
-            if (sickList.size() != 0) {
-                createQuestion();
-                loadChatAdapter();
-            }
+        } else {
+            lastId++;
+            String rep = "Bạn vui lòng kết nối internet để tôi có thể tư vấn cho bạn";
+            addMessgeToDb(new ChatMessage(lastId, true, rep));
+            items.add(new ChatMessage(lastId, true, rep));
         }
     }
 
@@ -305,14 +313,11 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
     }
 
     public void loadChatAdapter() {
-
         chatAdapter = new ChatAdapter(rootView.getContext(), R.layout.item_chat_right, items);
         //chatText.setText("");
-
         // to scroll the list view to bottom on data change
         listView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
         listView.setAdapter(chatAdapter);
-
     }
 
     public int mathResult(ArrayList<Integer> countYesSickList, ArrayList<SickItem> sickList) {
@@ -334,7 +339,6 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
     //convert json array to arraylist
     public ArrayList<String> convertToList(JSONArray a) {
         ArrayList<String> list = new ArrayList<>();
-
         for (int i = 0; i < a.length(); i++) {
             try {
                 list.add(a.get(i).toString());
@@ -342,14 +346,12 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
                 e.printStackTrace();
             }
         }
-
         return list;
     }
 
     //convert json object to array list
     public ArrayList<SickItem> convertResponseToArray(JSONObject response) {
         ArrayList<SickItem> list = new ArrayList<>();
-
         try {
             JSONArray array = response.getJSONArray("data");
             for (int i = 0; i < array.length(); i++) {
@@ -359,7 +361,6 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
                         object.getString(Var.SICK_BAN_FOODS), convertToList(object.getJSONArray(Var.SICK_SYMPTOMS)),
                         object.getString(Var.SICK_TREATMENT), object.getString(Var.SICK_DESCRIPTION), object.getString(Var.SICK_PREVENTION));
                 list.add(sickItem);
-                Log.d("TienDH", sickItem.getName());
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -375,17 +376,15 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
     private void getMessageDoctor(String message, final VolleyCallback callback) throws UnsupportedEncodingException {
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, Var.URL_SEND_QUESTION + URLEncoder.encode(message, "utf-8"), null, new Response.Listener<JSONObject>() {
-
                     @Override
                     public void onResponse(JSONObject response) {
                         callback.onSuccess(response);
-
                     }
                 }, new Response.ErrorListener() {
-
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.d("TienDH", "Res Error" + error.toString());
+                        Toast.makeText(getContext(), "Xảy ra lỗi! Vui lòng thử lại", Toast.LENGTH_SHORT).show();
                     }
                 }) {
             @Override
@@ -398,9 +397,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
         MySingleton.getInstance(getContext()).addToRequestQueue(jsObjRequest);
     }
 
-    private void startVoiceRecognitionActivity() {// use google
-        // voice in
-        // phone
+    private void startVoiceRecognitionActivity() {
         try {
             Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -444,9 +441,6 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
             case R.id.btnVoice:
                 startVoiceRecognitionActivity();
                 break;
-
         }
     }
-
-
 }

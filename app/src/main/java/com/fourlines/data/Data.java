@@ -12,5 +12,4 @@ public class Data {
     public static UserItem user;
     public static ArrayList<NotificationItem> notifList;
 
-
 }

@@ -9,23 +9,51 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.fourlines.doctor.SqlashScreen">
 
-    <ImageView
-
-        android:id="@+id/logo"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+    <LinearLayout
+        android:id="@+id/logoLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/logo"
-        />
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingTop="200dp">
 
-    <com.google.android.gms.common.SignInButton
-        android:visibility="invisible"
-        android:id="@+id/sign_in_button"
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:src="@drawable/logo" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="SAM"
+            android:textColor="@color/white"
+            android:textSize="60dp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/logo"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="60dp"
-         />
+        android:layout_centerVertical="true"
+        android:indeterminate="true"
+        android:rotation="90"
+        android:visibility="invisible" />
+
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/sign_in_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="160dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:visibility="invisible" />
 </RelativeLayout>

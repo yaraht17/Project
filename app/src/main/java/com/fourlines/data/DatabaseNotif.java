@@ -6,28 +6,28 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.fourlines.model.ChatMessage;
+import com.fourlines.model.NotificationItem;
 
 import java.util.ArrayList;
 
-public class DatabaseChat extends SQLiteOpenHelper {
+public class DatabaseNotif extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "db_doctor";
-    public static final String TABLE_NAME = "tbl_chat_history";
+    public static final String TABLE_NAME = "tbl_notification";
     public static final int verson = 6;
     public static final String TAG = "TienDH";
 
     public static final String CL_ID = "ID";
-    public static final String CL_SENDER = "sender";
-    public static final String CL_MESSAGE = "message";
+    public static final String CL_TITLE = "title";
+    public static final String CL_TOPIC = "topic";
+    public static final String CL_CONTENT = "content";
 
     public SQLiteDatabase mSQLitedb;
 
     public Context mContext;
 
-    public DatabaseChat(Context context) {
+    public DatabaseNotif(Context context) {
         super(context, DATABASE_NAME, null, verson);
         mSQLitedb = getWritableDatabase();
         mContext = context;
@@ -54,8 +54,8 @@ public class DatabaseChat extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
         String createTable = "CREATE TABLE " + TABLE_NAME + "(" + CL_ID
-                + " INTEGER PRIMARY KEY AUTOINCREMENT, " + CL_SENDER + " TEXT, "
-                + CL_MESSAGE + " TEXT);";
+                + " TEXT, " + CL_TITLE + " TEXT, "
+                + CL_TOPIC + " TEXT, " + CL_CONTENT + " TEXT);";
 
         if (!isTableExists(db, TABLE_NAME)) {
             Log.d(null, "Oncreate " + createTable);
@@ -73,65 +73,58 @@ public class DatabaseChat extends SQLiteOpenHelper {
     /*
      * - them mot doi tuong Friend vao trong csdl
      */
-    public void insertChatHistoryItem(ChatMessage chatMessage) {
+    public void insertNotifItem(NotificationItem notificationItem) {
 
         ContentValues values = new ContentValues();
-        values.put(CL_SENDER, String.valueOf(chatMessage.left));
-        values.put(CL_MESSAGE, chatMessage.message);
+        values.put(CL_ID, notificationItem.getId());
+        values.put(CL_TITLE, notificationItem.getTitle());
+        values.put(CL_TOPIC, notificationItem.getTopic());
+        values.put(CL_CONTENT, notificationItem.getBody());
 
         if (mSQLitedb.insert(TABLE_NAME, null, values) == -1) {
             // Log.d("INSERT", friend.getName() + "- " + friend.getId());
-            Toast.makeText(mContext, "Add New Error", Toast.LENGTH_SHORT)
-                    .show();
-        }
-        else{
-            Log.d("INSERT", chatMessage.left + " " + chatMessage.message);
-        }
-
-    }
-
-    public int getLastId(){
-        Cursor cursor = mSQLitedb.rawQuery("SELECT COUNT(*) AS last_id FROM "+ TABLE_NAME, null);
-
-        int lastId = 0;
-        if(cursor.moveToNext()){
-            int numberLastId = cursor.getColumnIndex("last_id");
-            lastId = cursor.getInt(numberLastId);
+            Log.d("TienDH", "insert error");
+        } else {
+            Log.d("TienDH", "Insert " + notificationItem.getTitle() + " " + notificationItem.getTopic()
+                    + " " + notificationItem.getBody());
         }
 
-        cursor.close();
-        Log.d("Last Id", String.valueOf(lastId));
-        return lastId;
     }
 
     /*
      * - lay toan bo ban ghi trong bang co trong csdl
      */
-    public ArrayList<ChatMessage> getChatHistoryList(long startId, long endId) {
+    public ArrayList<NotificationItem> getNotifList() {
 
-        ArrayList<ChatMessage> list = new ArrayList<ChatMessage>();
-        Cursor cursor = mSQLitedb.query(TABLE_NAME, null, CL_ID + ">= ? AND " + CL_ID + " <= ? "
-                , new String[]{String.valueOf(startId), String.valueOf(endId)}, null,
-                null, null);
+        ArrayList<NotificationItem> list = new ArrayList<NotificationItem>();
+        Cursor cursor = mSQLitedb.query(TABLE_NAME, null, null, null, null, null, null);
 
         while (cursor.moveToNext()) {
             int numberId = cursor.getColumnIndex(CL_ID);
-            int numberSender = cursor.getColumnIndex(CL_SENDER);
-            int numberMessage = cursor.getColumnIndex(CL_MESSAGE);
+            int numberTitle = cursor.getColumnIndex(CL_TITLE);
+            int numberTopic = cursor.getColumnIndex(CL_TOPIC);
+            int numberContent = cursor.getColumnIndex(CL_CONTENT);
 
-            int id = cursor.getInt(numberId);
-            String sender = cursor.getString(numberSender);
-            String message = cursor.getString(numberMessage);
+            String id = cursor.getString(numberId);
+            String title = cursor.getString(numberTitle);
+            String topic = cursor.getString(numberTopic);
+            String content = cursor.getString(numberContent);
 
-            ChatMessage item = new ChatMessage(id, Boolean.valueOf(sender), message);
+            NotificationItem item = new NotificationItem(id, 0, title, content, topic);
             list.add(item);
-            Log.d(TAG, "getList :" + item.left + " " + item.message);
+            Log.d(TAG, "getList :" + item.getTitle() + " " + item.getTopic() + " " + item.getBody());
         }
         cursor.close();
         return list;
     }
 
+    public void createTable() {
+        onCreate(mSQLitedb);
+        Log.d(TAG, "CREATE TABLE");
+    }
+
     public void dropTable() {
+        Log.d(TAG, "DROP TABLE");
         String sqldrop = "DROP TABLE IF EXISTS " + TABLE_NAME;
         mSQLitedb.execSQL(sqldrop);
         onCreate(mSQLitedb);
@@ -144,5 +137,4 @@ public class DatabaseChat extends SQLiteOpenHelper {
         if (mSQLitedb != null && mSQLitedb.isOpen())
             mSQLitedb.close();
     }
-
 }

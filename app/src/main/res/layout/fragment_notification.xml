@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     tools:context="com.fourlines.fragment.NotificationFragment">
 
+
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
@@ -26,4 +27,18 @@
             android:dividerHeight="5dp" />
     </android.support.v4.widget.SwipeRefreshLayout>
 
+    <LinearLayout
+        android:id="@+id/alertConnection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/alert"
+        android:gravity="center"
+        android:padding="5dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Không có kết nối" />
+    </LinearLayout>
 </RelativeLayout>

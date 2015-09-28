@@ -24,6 +24,10 @@ public class UserItem implements Serializable {
         this.fullname = fullname;
     }
 
+    public UserItem() {
+
+    }
+
     public String getAvatarUrl() {
         return avatarUrl;
     }

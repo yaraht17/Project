@@ -1,4 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -33,9 +33,26 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/alertConnection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/top"
+        android:background="@color/alert"
+        android:gravity="center"
+        android:padding="5dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Không có kết nối" />
+    </LinearLayout>
+
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/top">
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -58,4 +75,4 @@
                 android:layout_height="wrap_content" />
         </android.support.v4.widget.SwipeRefreshLayout>
     </RelativeLayout>
-</LinearLayout>
+</RelativeLayout>

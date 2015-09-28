@@ -3,6 +3,7 @@ package com.fourlines.fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -24,6 +25,7 @@ import android.widget.RelativeLayout;
 import com.fourlines.adapter.ImageAdapter;
 import com.fourlines.adapter.SickListAdapter;
 import com.fourlines.adapter.SickTypeListAdapter;
+import com.fourlines.connection.ConnectionDetector;
 import com.fourlines.data.Data;
 import com.fourlines.data.Var;
 import com.fourlines.doctor.R;
@@ -55,15 +57,14 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
     private SickTypeListAdapter sickTypeAdapter;
     private View rootView;
     private int screenWidth, screenHeight;
-
-//
+    private LinearLayout alertConnection;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_sick_list,
                 container, false);
-
+        alertConnection = (LinearLayout) rootView.findViewById(R.id.alertConnection);
         edtSearchSick = (EditText) rootView.findViewById(R.id.edt_lsf_search);
         imgClearText = (ImageView) rootView.findViewById(R.id.img_lsf_remove_text);
         listResultSearch = (ListView) rootView.findViewById(R.id.lv_lsf_result_search);
@@ -72,7 +73,6 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
         gridView = (GridView) rootView.findViewById(R.id.sickTypeList);
 
         edtSearchSick.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) {
                     hideKeyboard();
@@ -84,9 +84,7 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
                     InputMethodManager imanager = (InputMethodManager) getActivity()
                             .getSystemService(Context.INPUT_METHOD_SERVICE);
                     imanager.hideSoftInputFromWindow(edtSearchSick.getWindowToken(), 0);
-
                 }
-
             }
         });
         DisplayMetrics displaymetrics = new DisplayMetrics();
@@ -100,19 +98,21 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
         imgClearText.setOnClickListener(this);
         gridView.setOnItemClickListener(this);
         final ConnectServer con = new ConnectServer(getContext());
-        try {
-            con.getSick("all", "", new VolleyCallback() {
-                @Override
-                public void onSuccess(JSONObject respond) {
-                    sickResultItems = con.convertResponseToArray(respond);
-                    Data.sickList = sickResultItems;
-                    adapterSickList = new SickListAdapter(rootView.getContext(),
-                            R.layout.fragment_sick_list, sickResultItems);
-                    listResultSearch.setAdapter(adapterSickList);
-                }
-            });
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+        if (ConnectionDetector.isNetworkConnected(rootView.getContext())) {
+            try {
+                con.getSick("all", "", new VolleyCallback() {
+                    @Override
+                    public void onSuccess(JSONObject respond) {
+                        sickResultItems = con.convertResponseToArray(respond);
+                        Data.sickList = sickResultItems;
+                        adapterSickList = new SickListAdapter(rootView.getContext(),
+                                R.layout.fragment_sick_list, sickResultItems);
+                        listResultSearch.setAdapter(adapterSickList);
+                    }
+                });
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
         }
         action();
 
@@ -147,27 +147,26 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
             }
 
             @Override
-            public void afterTextChanged(Editable arg0) {// change list view
-                // when input text
-                // to edittext
-                // search
+            public void afterTextChanged(Editable arg0) {
                 String text = arg0.toString().toLowerCase(Locale.getDefault());
                 if (text.equals("")) {
                     imgClearText.setVisibility(ImageView.INVISIBLE);
                     layoutMenu.setVisibility(RelativeLayout.VISIBLE);
                     layoutResult.setVisibility(RelativeLayout.INVISIBLE);
                 } else {
-//                    adapterSickList = new SickListAdapter(rootView.getContext(),
-//                            R.layout.fragment_sick_list, sickResultItems);
-//                    listResultSearch.setAdapter(adapterSickList);
-//                    adapterSickList.filter(text);
+                    if (ConnectionDetector.isNetworkConnected(rootView.getContext())) {
+                        alertConnection.setVisibility(View.GONE);
+                    } else {
+                        alertConnection.setVisibility(View.VISIBLE);
+                        mHandler.postDelayed(delay, 6 * 1000);
+                    }
                     imgClearText.setVisibility(ImageView.VISIBLE);
                     layoutResult.setVisibility(RelativeLayout.VISIBLE);
                     layoutMenu.setVisibility(RelativeLayout.INVISIBLE);
+
                 }
             }
         });
-
 
     }
 
@@ -217,4 +216,12 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         intentAction(position);
     }
+
+    Handler mHandler = new Handler();
+
+    private Runnable delay = new Runnable() {
+        public void run() {
+            alertConnection.setVisibility(View.GONE);
+        }
+    };
 }

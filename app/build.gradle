@@ -35,4 +35,6 @@ dependencies {
     compile 'com.google.android.gms:play-services:8.1.0'
     compile 'de.hdodenhof:circleimageview:2.0.0'
     compile project(':volley')
+    compile files('libs/samsung-digital-health-healthdata-1.1.0.jar')
+    compile files('libs/sdk-v1.0.0.jar')
 }
