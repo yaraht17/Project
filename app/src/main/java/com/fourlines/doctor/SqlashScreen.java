@@ -156,7 +156,7 @@ public class SqlashScreen extends AppCompatActivity implements
                                 String name = null;
                                 String avatar = null;
                                 try {
-                                    respond.getString("name");
+                                    name = respond.getString("name");
                                     avatar = respond.getString(Var.AVATAR);
                                 } catch (JSONException e) {
                                     avatar = null;
@@ -357,7 +357,7 @@ public class SqlashScreen extends AppCompatActivity implements
                         String name = null;
                         String avatar = null;
                         try {
-                            respond.getString("name");
+                            name = respond.getString("name");
                             avatar = respond.getString(Var.AVATAR);
                         } catch (JSONException e) {
                             avatar = null;

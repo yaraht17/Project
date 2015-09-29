@@ -200,6 +200,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
         accessToken = sharedPreferences.getString(Var.ACCESS_TOKEN, "");
         Log.d("TienDH", "acctoken: " + accessToken);
         if (Data.user != null) {
+            Log.d("TienDH", "user static not null");
             content.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
             user = Data.user;
@@ -217,6 +218,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
                 progressBar.setVisibility(View.GONE);
                 String email = sharedPreferences.getString(Var.EMAIL, "");
                 String name = sharedPreferences.getString(Var.FULLNAME, "");
+                Log.d("TienDH", "name :" + name);
                 //load in sharepre
                 setInfoUserOffline(name, email);
                 txtAlert.setText(getString(R.string.nointernet));

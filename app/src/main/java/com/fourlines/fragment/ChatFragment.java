@@ -116,9 +116,11 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
         sharedPreferences = getContext().getSharedPreferences(Var.MY_PREFERENCES, Context.MODE_PRIVATE);
         accessToken = sharedPreferences.getString(Var.ACCESS_TOKEN, "");
         avatarUrl = sharedPreferences.getString(Var.AVATAR, "");
-        if (!avatarUrl.equals("")) {
+        if (!avatarUrl.equals("") || avatarUrl != null) {
             Log.d("TienDH", "Download image...");
-            new GetImageFromUrl().execute(avatarUrl);
+            if (ConnectionDetector.isNetworkConnected(getContext())) {
+                new GetImageFromUrl().execute(avatarUrl);
+            }
         } else {
             Log.d("TienDH", "No link avatar...");
         }
