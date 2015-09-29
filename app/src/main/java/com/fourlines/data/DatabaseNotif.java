@@ -85,8 +85,8 @@ public class DatabaseNotif extends SQLiteOpenHelper {
             // Log.d("INSERT", friend.getName() + "- " + friend.getId());
             Log.d("TienDH", "insert error");
         } else {
-            Log.d("TienDH", "Insert " + notificationItem.getTitle() + " " + notificationItem.getTopic()
-                    + " " + notificationItem.getBody());
+//            Log.d("TienDH", "Insert " + notificationItem.getTitle() + " " + notificationItem.getTopic()
+//                    + " " + notificationItem.getBody());
         }
 
     }
@@ -112,7 +112,7 @@ public class DatabaseNotif extends SQLiteOpenHelper {
 
             NotificationItem item = new NotificationItem(id, 0, title, content, topic);
             list.add(item);
-            Log.d(TAG, "getList :" + item.getTitle() + " " + item.getTopic() + " " + item.getBody());
+//            Log.d(TAG, "getList :" + item.getTitle() + " " + item.getTopic() + " " + item.getBody());
         }
         cursor.close();
         return list;

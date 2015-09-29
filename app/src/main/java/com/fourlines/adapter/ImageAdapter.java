@@ -18,11 +18,13 @@ public class ImageAdapter extends BaseAdapter {
     private Context mContext;
     private ArrayList<SickType> items;
     int size;
+    int height;
 
-    public ImageAdapter(Context c, int size, ArrayList<SickType> items) {
+    public ImageAdapter(Context c, int size, int height, ArrayList<SickType> items) {
         mContext = c;
         this.size = size;
         this.items = items;
+        this.height = height;
     }
 
     public int getCount() {
@@ -44,7 +46,7 @@ public class ImageAdapter extends BaseAdapter {
         if (convertView == null) {
             view = LayoutInflater.from(mContext).inflate(
                     R.layout.item_sick_type, parent, false);
-            view.setLayoutParams(new GridView.LayoutParams(size, size));
+            view.setLayoutParams(new GridView.LayoutParams(size, height));
         } else {
             view = convertView;
         }

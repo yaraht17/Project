@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="match_parent"
-    android:background="@color/Theme1"
+    android:layout_height="wrap_content"
+    android:background="@color/background"
     android:orientation="vertical">
 
     <ImageView
@@ -14,7 +14,7 @@
         android:layout_alignParentTop="true"
         android:layout_gravity="center_horizontal"
         android:layout_margin="40dp"
-        android:src="@drawable/demo" />
+        android:src="@drawable/xuongkhop" />
 
     <TextView
         android:id="@+id/nameSickType"
@@ -24,10 +24,9 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:autoText="false"
-        android:background="#50000000"
         android:gravity="center"
         android:text="New Text"
         android:textAlignment="center"
-        android:textColor="#FFFFFF"
+        android:textColor="#7d7d7d"
         android:textSize="20dp" />
 </RelativeLayout>

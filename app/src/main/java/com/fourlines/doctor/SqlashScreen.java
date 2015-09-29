@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,7 +27,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.fourlines.connection.ConnectionDetector;
 import com.fourlines.data.Var;
-import com.fourlines.model.UserItem;
 import com.fourlines.volley.ConnectServer;
 import com.fourlines.volley.MySingleton;
 import com.fourlines.volley.VolleyCallback;
@@ -71,13 +72,19 @@ public class SqlashScreen extends AppCompatActivity implements
     private ImageView imageLogo;
     private LinearLayout layoutLogo;
     private ProgressBar progressBar;
+    Typeface utm_showcard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sqlash_screen);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         imageLogo = (ImageView) findViewById(R.id.logo);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        TextView txtSam = (TextView) findViewById(R.id.sam);
+
+        utm_showcard = Typeface.createFromAsset(getAssets(), "utm-showcard.ttf");
+        txtSam.setTypeface(utm_showcard);
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -134,9 +141,10 @@ public class SqlashScreen extends AppCompatActivity implements
             //co token
             if (ConnectionDetector.isNetworkConnected(getApplicationContext())) {
                 final ConnectServer con = new ConnectServer(this);
-                con.getDataAccount(accessToken, new VolleyCallback() {
+                con.validateToken(accessToken, new VolleyCallback() {
                     @Override
                     public void onSuccess(JSONObject respond) {
+                        Log.d("TienDH", "valid: " + respond.toString());
                         try {
                             if (respond.getString("status").equals("fail")) {
                                 //sai token
@@ -144,12 +152,24 @@ public class SqlashScreen extends AppCompatActivity implements
 
                                 showLogin();
                             } else {
-                                //dung token
-                                UserItem userItem = con.responseToObject(respond);
+                                String email = respond.getString(Var.EMAIL);
+                                String name = null;
+                                String avatar = null;
+                                try {
+                                    respond.getString("name");
+                                    avatar = respond.getString(Var.AVATAR);
+                                } catch (JSONException e) {
+                                    avatar = null;
+                                    name = null;
+                                }
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putString(Var.FULLNAME, userItem.getFullname());
-                                editor.putString(Var.EMAIL, userItem.getEmail());
+                                editor.putString(Var.FULLNAME, name);
+                                editor.putString(Var.EMAIL, email);
+                                editor.putString(Var.AVATAR, avatar);
                                 editor.commit();
+//                                if (avatar != null) {
+//                                    new GetImageFromUrl().execute(avatar);
+//                                }
                                 showSignedInUI();
                             }
                         } catch (JSONException e) {
@@ -206,7 +226,7 @@ public class SqlashScreen extends AppCompatActivity implements
             Log.d(TAG, "Info: " + personName + "  " + personGooglePlusProfile + " " + personBirthday);
             if (accessToken.equals("")) {
                 new GetIdTokenTask().execute();
-                showSignedInUI();
+
             }
         }
         String email = Plus.AccountApi.getAccountName(mGoogleApiClient);
@@ -317,8 +337,8 @@ public class SqlashScreen extends AppCompatActivity implements
                 loginAction(result);
             } else {
                 onSignOut();
-                Toast.makeText(getApplicationContext(), "Xảy ra lỗi, vui lòng đăng nhập lại", Toast.LENGTH_LONG).show();
                 Log.i(TAG, "ID token: null");
+                onRestart();
             }
         }
     }
@@ -329,11 +349,28 @@ public class SqlashScreen extends AppCompatActivity implements
             login(idToken, new VolleyCallback() {
                 @Override
                 public void onSuccess(JSONObject respond) {
-                    Log.d("TienDH", respond.toString());
+                    Log.d("TienDH", "getACCtoken :" + respond.toString());
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     try {
                         editor.putString(Var.ACCESS_TOKEN, respond.getString(Var.ACCESS_TOKEN));
+                        String email = respond.getString(Var.EMAIL);
+                        String name = null;
+                        String avatar = null;
+                        try {
+                            respond.getString("name");
+                            avatar = respond.getString(Var.AVATAR);
+                        } catch (JSONException e) {
+                            avatar = null;
+                            name = null;
+                        }
+                        editor.putString(Var.FULLNAME, name);
+                        editor.putString(Var.EMAIL, email);
+                        editor.putString(Var.AVATAR, avatar);
                         editor.commit();
+//                        if (avatar != null) {
+//                            new GetImageFromUrl().execute(avatar);
+//                        }
+                        showSignedInUI();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -360,7 +397,6 @@ public class SqlashScreen extends AppCompatActivity implements
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d("LinhTh", error.toString());
                         onRestart();
                     }
                 });
@@ -381,4 +417,6 @@ public class SqlashScreen extends AppCompatActivity implements
             btnLoginGoogle.setVisibility(View.VISIBLE);
         }
     };
+
+
 }

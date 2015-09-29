@@ -17,12 +17,14 @@
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipeContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="5dp">
 
         <com.fourlines.view.EndlessListView
             android:id="@+id/listNotif"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+
             android:divider="@null"
             android:dividerHeight="5dp" />
     </android.support.v4.widget.SwipeRefreshLayout>

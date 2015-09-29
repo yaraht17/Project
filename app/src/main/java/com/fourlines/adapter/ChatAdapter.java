@@ -1,6 +1,10 @@
 package com.fourlines.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +51,16 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage> {
             viewHolder.avatar.setImageResource(R.drawable.bacsi);
         } else {
             viewHolder.avatar.setImageResource(R.drawable.benhnhan);
+            String path = Environment.getExternalStorageDirectory() + "/SAM/pictures/avatar.png";
+            Bitmap bitmap = BitmapFactory.decodeFile(path);
+            if (bitmap != null) {
+                Log.d("TienDH", "bitmap not null");
+                bitmap = Bitmap.createScaledBitmap(bitmap, 50, 50, true);
+                viewHolder.avatar.setImageBitmap(bitmap);
+            } else {
+                viewHolder.avatar.setImageResource(R.drawable.benhnhan);
+            }
+
         }
         return row;
     }
@@ -55,4 +69,6 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage> {
         TextView message;
         ImageView avatar;
     }
+
+
 }

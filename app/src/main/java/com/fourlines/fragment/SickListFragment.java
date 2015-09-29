@@ -2,6 +2,7 @@ package com.fourlines.fragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -58,6 +59,7 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
     private View rootView;
     private int screenWidth, screenHeight;
     private LinearLayout alertConnection;
+    private RelativeLayout layoutBg;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,7 +73,7 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
         layoutMenu = (LinearLayout) rootView.findViewById(R.id.layout_menu);
         layoutResult = (RelativeLayout) rootView.findViewById(R.id.layout_result_search);
         gridView = (GridView) rootView.findViewById(R.id.sickTypeList);
-
+        layoutBg = (RelativeLayout) rootView.findViewById(R.id.layoutBg);
         edtSearchSick.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) {
@@ -92,9 +94,11 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
         screenHeight = displaymetrics.heightPixels;
         screenWidth = displaymetrics.widthPixels;
 
-        int cat_size = (screenWidth - 10) / 2;
+        //cho nay nhe
+        int width = (screenWidth - 20) / 2;
+        int height = (screenHeight / 4 ) + 10;
         sickTypeList = createSickType();
-        gridView.setAdapter(new ImageAdapter(rootView.getContext(), cat_size, sickTypeList));
+        gridView.setAdapter(new ImageAdapter(rootView.getContext(), width, height, sickTypeList));
         imgClearText.setOnClickListener(this);
         gridView.setOnItemClickListener(this);
         if (Data.sickList != null) {
@@ -127,6 +131,21 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
                 e.printStackTrace();
             }
         }
+    }
+
+    public static float convertDpToPixels(int dp, Context context) {
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        int px = (int) (dp * (metrics.densityDpi / 160f));
+        return px;
+    }
+
+    public static float convertPixelsToDp(int px, Context context) {
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        int dp = (int) (px / (metrics.densityDpi / 160f));
+        return dp;
+
     }
 
     public void action() {
@@ -195,11 +214,11 @@ public class SickListFragment extends Fragment implements OnClickListener, OnIte
 
     private ArrayList<SickType> createSickType() {
         ArrayList list = new ArrayList();
-        list.add(new SickType(0, R.drawable.hohap, "Hô Hấp"));
-        list.add(new SickType(1, R.drawable.tuanhoan, "Tuần Hoàn"));
+        list.add(new SickType(0, R.drawable.tuanhoan, "Tuần Hoàn"));
+        list.add(new SickType(1, R.drawable.xuongkhop, "Xương Khớp"));
         list.add(new SickType(2, R.drawable.tieuhoa, "Tiêu Hóa"));
         list.add(new SickType(3, R.drawable.ngoaida, "Ngoài Da"));
-        list.add(new SickType(4, R.drawable.xuongkhop, "Xương Khớp"));
+        list.add(new SickType(4, R.drawable.hohap, "Hô Hấp"));
         list.add(new SickType(5, R.drawable.thankinh, "Thần Kinh"));
         return list;
 

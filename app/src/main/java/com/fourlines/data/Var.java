@@ -42,6 +42,8 @@ public class Var {
     public static final String URL_GET_TIPS = URL_HOST + "/api/v1/tips?page=";
     public static final String URL_SEND_QUESTION = URL_HOST + "/api/v1/question?question=";
     public static final String URL_SEND_SICK = URL_HOST + "/api/v1/sicks/push";
+    public static final String URL_VALIDATE_TOKEN = URL_HOST + "/api/v1/token/valid";
+
     public static final String CHAT_STATUS = "status";
     public static final String CHAT_TYPE = "type";
     public static final String CHAT_DATA = "data";
@@ -50,7 +52,8 @@ public class Var {
 
     public static final String SICK_KEY = "SICK_KEY";
     public static final String SICK_TYPE_KEY = "SICK_TYPE_KEY";
-    public static final String[] SICKTYPE = {"Hô hấp", "Tuần hoàn", "Tiêu hóa", "Ngoài da", "Xương khớp", "Thần kinh"};
+    public static final String[] SICKTYPE = {"Tuần hoàn", "Xương khớp", "Tiêu hóa", "Ngoài da", "Hô hấp", "Thần kinh"};
+
     public static int drawList[] = {R.drawable.avatar, R.drawable.avatar1, R.drawable.avatar2,
             R.drawable.avatar4, R.drawable.avatar5, R.drawable.avatar3};
     public static final String[] TRUE = {"có", "vâng", "đúng", "chuẩn", "ừ", "hơi hơi", "thỉnh thoảng", "hay bị"};

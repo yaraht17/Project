@@ -2,11 +2,14 @@ package com.fourlines.fragment;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,10 +18,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -32,15 +37,18 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.fourlines.adapter.InfoAdapter;
+import com.fourlines.adapter.SickHistoryListAdapter;
 import com.fourlines.connection.ConnectionDetector;
 import com.fourlines.data.Data;
 import com.fourlines.data.DatabaseChat;
 import com.fourlines.data.DatabaseNotif;
 import com.fourlines.data.Var;
 import com.fourlines.doctor.R;
+import com.fourlines.doctor.SickDetailActivity;
 import com.fourlines.doctor.SqlashScreen;
+import com.fourlines.model.HistoryItem;
 import com.fourlines.model.InfoItem;
-import com.fourlines.model.NotificationItem;
+import com.fourlines.model.SickHistoryItem;
 import com.fourlines.model.SickItem;
 import com.fourlines.model.UserItem;
 import com.fourlines.volley.ConnectServer;
@@ -75,14 +83,13 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener, AdapterView.OnItemClickListener {
 
     public static final String APP_TAG = "SimpleHealth";
     private final int MENU_ITEM_PERMISSION_SETTING = 1;
@@ -95,7 +102,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
     private static final String TAG = "TienDH";
     private View rootView;
     private ArrayList<InfoItem> infoList;
-    private ArrayList<SickItem> sickList;
+    private ArrayList<SickHistoryItem> sickList;
     private ListView infoListView, sickHistoryListView;
     private InfoAdapter infoAdapter;
     private TextView iconLogout;
@@ -112,20 +119,18 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
     private static final int RC_SIGN_IN = 9001;
     private GoogleApiClient mGoogleApiClient;
     private boolean mIsResolving = false;
-
+    private TextView txtAlertSHealth;
     private boolean mShouldResolve = false;
-
-    private Map<String, String> listData = new HashMap<>();
+    private SickHistoryListAdapter sickHistoryListAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_profile, container, false);
-
+        getActivity().registerReceiver(broadcastReceiver, new IntentFilter(Var.INTERNET_CHECK));
         infoListView = (ListView) rootView.findViewById(R.id.listInfo);
         iconLogout = (TextView) rootView.findViewById(R.id.iconLogout);
         txtUserName = (TextView) rootView.findViewById(R.id.userName);
-        txtAge = (TextView) rootView.findViewById(R.id.ageUser);
         txtEmail = (TextView) rootView.findViewById(R.id.emailUser);
         btnLogout = (LinearLayout) rootView.findViewById(R.id.logout);
         progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
@@ -133,12 +138,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
         txtAlert = (TextView) rootView.findViewById(R.id.txtAlert);
         content = (LinearLayout) rootView.findViewById(R.id.content);
         imageProfile = (ImageView) rootView.findViewById(R.id.imageUser);
-
+        txtAlertSHealth = (TextView) rootView.findViewById(R.id.txtAlertSHealth);
         btnLogout.setOnClickListener(this);
         font_awesome = Typeface.createFromAsset(rootView.getContext().getAssets(), "fontawesome-webfont.ttf");
         iconLogout.setTypeface(font_awesome);
         iconLogout.setText(getString(R.string.logout));
-
+        sickHistoryListView.setOnItemClickListener(this);
         mKeySet = new HashSet<HealthPermissionManager.PermissionKey>();
         mKeySet.add(new HealthPermissionManager.PermissionKey(HealthConstants.StepCount.HEALTH_DATA_TYPE,
                 HealthPermissionManager.PermissionType.READ));
@@ -167,27 +172,43 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
         mGoogleApiClient.connect();
 
         content.setVisibility(View.GONE);
-        if (sickList == null) {
+        if (Data.sickHistoryList == null) {
+            Log.d("TienDH", "sicks static null");
             ViewGroup.LayoutParams params = sickHistoryListView.getLayoutParams();
             params.height = 150;
             sickHistoryListView.setLayoutParams(params);
             sickHistoryListView.requestLayout();
             txtAlert.setText(getString(R.string.nosick));
             txtAlert.setVisibility(View.VISIBLE);
+            sickHistoryListView.setVisibility(View.INVISIBLE);
         } else {
+            Log.d("TienDH", "sicks static not null");
+            sickHistoryListView.setVisibility(View.VISIBLE);
             txtAlert.setVisibility(View.INVISIBLE);
+            //view listview
+            sickList = Data.sickHistoryList;
+            sickHistoryListAdapter = new SickHistoryListAdapter(getContext(), R.layout.item_sick_history, sickList);
+            sickHistoryListView.setAdapter(sickHistoryListAdapter);
+            ViewGroup.LayoutParams params = sickHistoryListView.getLayoutParams();
+            params.height = sickHistoryListAdapter.getCount() * convertDpToPixels(40, getContext()) + 100;
+            sickHistoryListView.setLayoutParams(params);
+            sickHistoryListView.requestLayout();
         }
         infoList = new ArrayList<>();
-//        infoList = createInfo();
         //get token
         sharedPreferences = rootView.getContext().getSharedPreferences(Var.MY_PREFERENCES, Context.MODE_PRIVATE);
         accessToken = sharedPreferences.getString(Var.ACCESS_TOKEN, "");
-
+        Log.d("TienDH", "acctoken: " + accessToken);
         if (Data.user != null) {
             content.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
             user = Data.user;
-            setInfoUser(user.getFullname(), user.getEmail(), user.getAvatarUrl());
+            if (ConnectionDetector.isNetworkConnected(rootView.getContext())) {
+                setInfoUser(user.getFullname(), user.getEmail(), user.getAvatarUrl());
+            } else {
+                setInfoUserOffline(user.getFullname(), user.getEmail());
+            }
+
         } else {
             if (ConnectionDetector.isNetworkConnected(rootView.getContext())) {
                 loading();
@@ -196,7 +217,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
                 progressBar.setVisibility(View.GONE);
                 String email = sharedPreferences.getString(Var.EMAIL, "");
                 String name = sharedPreferences.getString(Var.FULLNAME, "");
-
                 //load in sharepre
                 setInfoUserOffline(name, email);
                 txtAlert.setText(getString(R.string.nointernet));
@@ -208,9 +228,19 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
         return rootView;
     }
 
+    public static int convertDpToPixels(int dp, Context context) {
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        int px = (int) (dp * (metrics.densityDpi / 160f));
+        return px;
+    }
+
     @Override
     public void onResume() {
         super.onResume();
+        if (ConnectionDetector.isNetworkConnected(getContext())) {
+            loading();
+        }
         // Create a HealthDataStore instance and set its listener
         mStore = new HealthDataStore(getContext(), mConnectionListener);
         // Request the connection to the health data store
@@ -266,6 +296,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
                         drawHeartRate("");
                         drawHeightWeight("");
                         showPermissionAlarmDialog();
+                        txtAlertSHealth.setText("Không kết nối được SHealth");
+                        txtAlertSHealth.setVisibility(View.VISIBLE);
                     } else {
                         // Get the current step count and display it
                         start();
@@ -275,12 +307,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
 
     public void drawCalo(String count) {
         Log.d("TienDH", "so buoc chan: " + count);
+        if (count.equals("")) return;
         infoList.add(new InfoItem(getString(R.string.foot), "Calo tiêu thụ: " + count + " Cal"));
         infoAdapter = new InfoAdapter(rootView.getContext(), R.layout.item_info, infoList);
         infoListView.setAdapter(infoAdapter);
     }
 
     public void drawHeartRate(String count) {
+        if (count.equals("")) return;
         Log.d("TienDH", "nhip tim: " + count);
         infoList.add(new InfoItem(getString(R.string.heart), "Nhịp tim: " + count + " bpm"));
         infoAdapter = new InfoAdapter(rootView.getContext(), R.layout.item_info, infoList);
@@ -288,28 +322,24 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
     }
 
     public void drawHeightWeight(String count) {
+        if (count.equals("")) return;
         Log.d("TienDH", "cc+ cn: " + count);
         String s[] = count.split("-");
-        infoList.add(new InfoItem(getString(R.string.height), "Chiều cao: " + s[0] + " cm"));
-        infoList.add(new InfoItem(getString(R.string.weight), "Cân nặng: " + s[1] + " kg"));
-        infoList.add(new InfoItem(getString(R.string.bmi), "BMI: " + s[2]));
+        if (s.length >= 3) {
+            infoList.add(new InfoItem(getString(R.string.height), "Chiều cao: " + s[0] + " cm"));
+            infoList.add(new InfoItem(getString(R.string.weight), "Cân nặng: " + s[1] + " kg"));
+            infoList.add(new InfoItem(getString(R.string.bmi), "BMI: " + s[2]));
+        }
         infoAdapter = new InfoAdapter(rootView.getContext(), R.layout.item_info, infoList);
         infoListView.setAdapter(infoAdapter);
     }
 
     private void showPermissionAlarmDialog() {
-
-        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-        alert.setTitle("Notice");
-        alert.setMessage("All permissions should be acquired");
-        alert.setPositiveButton("OK", null);
-        alert.show();
-
+        Toast.makeText(getContext(), "Bạn chưa cấp đủ quyền truy cập SHealth", Toast.LENGTH_SHORT).show();
     }
 
     private void showConnectionFailureDialog(HealthConnectionErrorResult error) {
 
-        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
         mConnError = error;
         String message = "Không có kết nối với SHealth ";
 
@@ -332,23 +362,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
                     break;
             }
         }
-
-        alert.setMessage(message);
-
-        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                if (mConnError.hasResolution()) {
-                    mConnError.resolve(getActivity());
-                }
-            }
-        });
-
-        if (error.hasResolution()) {
-            alert.setNegativeButton("Cancel", null);
-        }
-
-        alert.show();
+        txtAlertSHealth.setText(message);
+        txtAlertSHealth.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -369,11 +384,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
     }
 
     private void setInfoUserOffline(String name, String email) {
+        Log.d("TienDH", "set info off");
         txtEmail.setText(email);
         txtUserName.setText(name);
         String path = Environment.getExternalStorageDirectory() + "/SAM/pictures/avatar.png";
         Bitmap bitmap = BitmapFactory.decodeFile(path);
         if (bitmap != null) {
+            Log.d("TienDH", "bitmap not null");
             bitmap = Bitmap.createScaledBitmap(bitmap, 100, 100, true);
             imageProfile.setImageBitmap(bitmap);
         }
@@ -399,16 +416,44 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
                 Log.d("TienDH", respond.toString());
                 try {
                     if (respond.getString("status").equals("fail")) {
+                        Toast.makeText(rootView.getContext(), "Xảy ra lỗi, đăng nhập lại", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(rootView.getContext(), SqlashScreen.class);
                         startActivity(intent);
                         getActivity().finish();
                     } else {
                         progressBar.setVisibility(View.GONE);
                         content.setVisibility(View.VISIBLE);
-                        UserItem userItem = con.responseToObject(respond);
-                        user = new UserItem(userItem.getId(), userItem.getEmail(), userItem.getFullname(), userItem.getAvatarUrl(), userItem.getList());
+                        HistoryItem historyItem = con.responseToObject(respond);
+                        user = new UserItem(historyItem.getUserItem().getId(), historyItem.getUserItem().getEmail(),
+                                historyItem.getUserItem().getFullname(), historyItem.getUserItem().getAvatarUrl(),
+                                historyItem.getUserItem().getList());
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString(Var.FULLNAME, user.getFullname());
+                        editor.putString(Var.EMAIL, user.getEmail());
+                        editor.commit();
                         Data.user = user;
                         setInfoUser(user.getFullname(), user.getEmail(), user.getAvatarUrl());
+                        sickList = getSickHistoryItem(historyItem);
+                        //view listview
+                        Data.sickHistoryList = sickList;
+                        sickHistoryListAdapter = new SickHistoryListAdapter(getContext(), R.layout.item_sick_history, sickList);
+                        sickHistoryListView.setAdapter(sickHistoryListAdapter);
+                        if (sickHistoryListAdapter.getCount() > 0) {
+                            ViewGroup.LayoutParams params = sickHistoryListView.getLayoutParams();
+                            params.height = sickHistoryListAdapter.getCount() * convertDpToPixels(40, getContext()) + 100;
+                            sickHistoryListView.setLayoutParams(params);
+                            sickHistoryListView.requestLayout();
+                            sickHistoryListView.setVisibility(View.VISIBLE);
+                            txtAlert.setVisibility(View.INVISIBLE);
+                        } else {
+                            ViewGroup.LayoutParams params = sickHistoryListView.getLayoutParams();
+                            params.height = 150;
+                            sickHistoryListView.setLayoutParams(params);
+                            sickHistoryListView.requestLayout();
+                            txtAlert.setText(getString(R.string.nosick));
+                            txtAlert.setVisibility(View.VISIBLE);
+                            sickHistoryListView.setVisibility(View.INVISIBLE);
+                        }
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -417,15 +462,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
         });
     }
 
-//    private ArrayList createInfo() {
-//        ArrayList list = new ArrayList();
-//        list.add(new InfoItem(getString(R.string.height), "Chiều cao: 180cm"));
-//        list.add(new InfoItem(getString(R.string.weight), "Cân nặng: 60kg"));
-//        list.add(new InfoItem(getString(R.string.bmi), "BMI: 19.7"));
-//        list.add(new InfoItem(getString(R.string.heart), "Nhịp tim: 70"));
-//        list.add(new InfoItem(getString(R.string.foot), "Số bước chân: 1800"));
-//        return list;
-//    }
+    public ArrayList<SickHistoryItem> getSickHistoryItem(HistoryItem items) {
+        ArrayList<SickHistoryItem> sickHistoryItems = new ArrayList<SickHistoryItem>();
+        for (int i = 0; i < items.getSicks().size(); i++) {
+            sickHistoryItems.add(new SickHistoryItem(items.getSicks().get(i), items.getDatetimes().get(i)));
+        }
+        return sickHistoryItems;
+    }
 
     @Override
     public void onClick(View v) {
@@ -437,6 +480,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
     @Override
     public void onStart() {
         super.onStart();
+        getActivity().registerReceiver(broadcastReceiver, new IntentFilter(Var.INTERNET_CHECK));
         mGoogleApiClient.connect();
     }
 
@@ -444,6 +488,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
     public void onStop() {
         super.onStop();
         mGoogleApiClient.disconnect();
+        getActivity().unregisterReceiver(broadcastReceiver);
     }
 
     @Override
@@ -505,14 +550,16 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
                     editor.remove(Var.ACCESS_TOKEN);
                     editor.remove(Var.FULLNAME);
                     editor.remove(Var.EMAIL);
+                    editor.remove(Var.AVATAR);
                     editor.commit();
                     String path = Environment.getExternalStorageDirectory() + "/SAM/pictures/avatar.png";
                     File file = new File(path);
                     boolean deleted = file.delete();
                     Data.user = null;
-                    Data.notifList = new ArrayList<NotificationItem>();
-                    Data.sickList = new ArrayList<SickItem>();
+                    Data.notifList = null;
+                    Data.sickList = null;
                     Data.sicks = new ArrayList[6];
+                    Data.sickHistoryList = null;
                     progressDialog.cancel();
                     Intent intent = new Intent(rootView.getContext(), SqlashScreen.class);
                     startActivity(intent);
@@ -550,6 +597,19 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
             }
         };
         MySingleton.getInstance(rootView.getContext()).addToRequestQueue(jsObjRequest);
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//        if (view.getId() == R.id.sickHistoryList) {
+        sendSickDetail(sickHistoryListAdapter.getItem(position).getSickItem());
+//        }
+    }
+
+    private void sendSickDetail(SickItem sickItem) {
+        Intent intent = new Intent(getContext(), SickDetailActivity.class);
+        intent.putExtra(Var.SICK_KEY, sickItem);
+        startActivity(intent);
     }
 
     public class GetImageFromUrl extends AsyncTask<String, Void, Bitmap> {
@@ -660,13 +720,15 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
     }
 
     public void start() {
+        txtAlertSHealth.setVisibility(View.INVISIBLE);
         // Register an observer to listen changes of step count and get today step count
         HealthDataObserver.addObserver(mStore, HealthConstants.StepCount.HEALTH_DATA_TYPE, mObserver);
         HealthDataObserver.addObserver(mStore, HealthConstants.HeartRate.HEALTH_DATA_TYPE, mObserver);
         HealthDataObserver.addObserver(mStore, HealthConstants.Weight.HEALTH_DATA_TYPE, mObserver);
         readWeightAndHeight();
         readHeartRate();
-        readDailyCalo(0, 0);
+        readDailyCalo();
+
     }
 
     private void readHeartRate() {
@@ -699,17 +761,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
         } catch (Exception e) {
             Log.e("LinhTh", e.getClass().getName() + " - " + e.getMessage());
         }
-    }
-
-    private long getStartTimeOfToday() {
-        Calendar today = Calendar.getInstance();
-
-        today.set(Calendar.HOUR_OF_DAY, 0);
-        today.set(Calendar.MINUTE, 0);
-        today.set(Calendar.SECOND, 0);
-        today.set(Calendar.MILLISECOND, 0);
-
-        return today.getTimeInMillis();
     }
 
     private final HealthResultHolder.ResultListener<HealthDataResolver.ReadResult> mListenerWeightHeight =
@@ -772,13 +823,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
         @Override
         public void onChange(String dataTypeName) {
             Log.d("LinhTh", "Observer receives a data changed event");
-            readDailyCalo(0, 0);
+            readDailyCalo();
             readWeightAndHeight();
             readHeartRate();
         }
     };
 
-    private void readDailyCalo(long from, long to) {
+    private void readDailyCalo() {
         Log.d("TienDH", "start count ");
         HealthDataResolver resolver = new HealthDataResolver(mStore, null);
         HealthDataResolver.AggregateRequest request = new HealthDataResolver.AggregateRequest.Builder()
@@ -808,8 +859,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
                             c = result.getResultCursor();
                             if (c != null) {
                                 while (c.moveToNext()) {
-                                    int col_num = c.getColumnCount();
-                                    String days = c.getString(c.getColumnIndex("days"));
                                     String average = c.getString(c.getColumnIndex("average"));
                                     listStepCount.add(average);
                                 }
@@ -824,4 +873,20 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
                     }
                 }
             };
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (ConnectionDetector.isNetworkConnected(getContext())) {
+                loading();
+            } else {
+                Log.d("TienDH", "no internt - set info off");
+                String email = sharedPreferences.getString(Var.EMAIL, "");
+                String name = sharedPreferences.getString(Var.FULLNAME, "");
+                setInfoUserOffline(name, email);
+            }
+        }
+
+    };
+
+
 }

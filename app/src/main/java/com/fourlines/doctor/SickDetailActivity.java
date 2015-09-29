@@ -1,5 +1,6 @@
 package com.fourlines.doctor;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -34,7 +35,7 @@ public class SickDetailActivity extends AppCompatActivity implements View.OnClic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sick_detail);
-
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         sickItem = (SickItem) getIntent().getSerializableExtra(Var.SICK_KEY);
 
         expListView = (ExpandableListView) findViewById(R.id.sickDetail);

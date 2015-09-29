@@ -86,37 +86,6 @@ public class SickListAdapter extends ArrayAdapter<SickItem> {
         TextView des;
     }
 
-//    public void filter(String charText) {
-//        try {
-//            charText = URLEncoder.encode(charText, "utf-8");
-//            charText = charText.toLowerCase(Locale.getDefault());
-//            //sickList.clear();
-//            ArrayList<SickItem> listTmp = new ArrayList<>();
-//
-//
-//            Log.d("TienDH", "size: " + sickList.size());
-//            for (SickItem wp : sickList) {
-//                String sickName = wp.getName();
-//                sickName = URLEncoder.encode(sickName, "utf-8");
-//                Log.d("TienDH", sickName);
-//                if (sickName.toLowerCase(Locale.getDefault()).contains(
-//                        charText)) {
-//                    listTmp.add(wp);
-//
-//                }
-//            }
-//
-//            sickList.clear();
-//            if (listTmp != null) {
-//                sickList.addAll(listTmp);
-//            }
-//            notifyDataSetChanged();
-//        } catch (UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        }
-//
-//    }
-
     public void filter(String charText) {
         charText = charText.toLowerCase(Locale.getDefault());
         worldpopulationlist.clear();

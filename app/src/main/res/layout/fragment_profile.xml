@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="@color/bg"
     android:orientation="vertical"
     tools:context="com.fourlines.fragment.ProfileFragment">
 
@@ -23,7 +23,7 @@
         <LinearLayout
             android:id="@+id/content"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <LinearLayout
@@ -42,8 +42,7 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:src="@drawable/benhnhan"
-                    app:civ_border_color="#FF000000"
-                    app:civ_border_width="1dp" />
+                    app:civ_border_color="#FF000000" />
 
                 <RelativeLayout
 
@@ -70,12 +69,7 @@
                         android:layout_below="@+id/userName"
                         android:textSize="16dp" />
 
-                    <TextView
-                        android:id="@+id/ageUser"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/emailUser"
-                        android:textSize="16dp" />
+
                 </RelativeLayout>
             </LinearLayout>
 
@@ -100,12 +94,31 @@
                     android:layout_marginTop="15dp"
                     android:background="#CCC" />
 
-                <ListView
-                    android:id="@+id/listInfo"
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="260dp"
-                    android:listSelector="@android:color/transparent"
-                    android:scrollbars="none" />
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/txtAlertSHealth"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:gravity="center"
+                        android:text="Vui lòng kết nối SHealth"
+                        android:textStyle="bold" />
+
+                    <ListView
+                        android:id="@+id/listInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="250dp"
+                        android:divider="@null"
+                        android:dividerHeight="0dp"
+                        android:listSelector="@android:color/transparent"
+                        android:scrollbars="none" />
+                </RelativeLayout>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -134,6 +147,7 @@
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="20dp"
+                        android:layout_marginTop="10dp"
                         android:gravity="center"
                         android:text="Chưa phát hiện bệnh, hãy nhờ bác sĩ tư vấn"
                         android:textStyle="bold" />
@@ -141,8 +155,9 @@
                     <ListView
                         android:id="@+id/sickHistoryList"
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:scrollbars="none" />
+                        android:layout_height="150dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="15dp" />
                 </RelativeLayout>
             </LinearLayout>
 
@@ -158,6 +173,7 @@
                 android:padding="10dp">
 
                 <TextView
+
                     android:id="@+id/iconLogout"
                     android:layout_width="40dp"
                     android:layout_height="40dp"

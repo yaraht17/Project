@@ -26,6 +26,7 @@
             android:src="@drawable/logo" />
 
         <TextView
+            android:id="@+id/sam"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -34,17 +35,6 @@
             android:textSize="60dp"
             android:textStyle="bold" />
     </LinearLayout>
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:indeterminate="true"
-        android:rotation="90"
-        android:visibility="invisible" />
-
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/sign_in_button"
@@ -56,4 +46,15 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:visibility="invisible" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:text="4Lines - For Easy Life"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        android:textStyle="bold" />
 </RelativeLayout>

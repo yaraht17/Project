@@ -10,8 +10,16 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/bot">
 
+        <ImageView
+            android:id="@+id/imgHello"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@drawable/hello"
+            android:visibility="visible" />
 
         <ListView
+
             android:id="@+id/msgview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -31,7 +39,7 @@
     <LinearLayout
         android:id="@+id/bot"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_alignParentBottom="true"
         android:background="#FFF"
         android:orientation="horizontal"
@@ -44,6 +52,7 @@
             android:layout_height="fill_parent"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
+            android:background="@drawable/selector_listview"
             android:gravity="center"
             android:text="@string/mic_icon"
             android:textSize="20dp" />
@@ -72,6 +81,7 @@
             android:layout_height="fill_parent"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="10dp"
+            android:background="@drawable/selector_listview"
             android:gravity="center"
             android:text="@string/send_icon"
             android:textSize="20dp" />

@@ -2,6 +2,7 @@ package com.fourlines.doctor;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         dbChat = new DatabaseChat(getApplicationContext());
         dbNotif = new DatabaseNotif(getApplicationContext());
 
@@ -83,9 +85,8 @@ public class MainActivity extends AppCompatActivity {
 //
 //    };
 //
-//    @Override
-//    protected void onStop() {
-//        super.onStop();
-//        unregisterReceiver(broadcastReceiver);
-//    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
 }

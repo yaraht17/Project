@@ -3,10 +3,18 @@ package com.fourlines.fragment;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +22,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,9 +46,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -68,6 +89,10 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
     private String symptom;
     private DatabaseChat db;
     private long lastId = 0;
+    private SharedPreferences sharedPreferences;
+    private String accessToken;
+    private ImageView imgHello;
+    private String avatarUrl;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -75,17 +100,28 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
         rootView = inflater.inflate(R.layout.fragment_chat,
                 container, false);
 
+
         font_awesome = Typeface.createFromAsset(rootView.getContext().getAssets(), "fontawesome-webfont.ttf");
         imgSend = (TextView) rootView.findViewById(R.id.btnSendMess);
         imgVoice = (TextView) rootView.findViewById(R.id.btnVoice);
         listView = (ListView) rootView.findViewById(R.id.msgview);
         chatText = (EditText) rootView.findViewById(R.id.edt_msg);
-
-
+        imgHello = (ImageView) rootView.findViewById(R.id.imgHello);
         imgSend.setTypeface(font_awesome);
         imgVoice.setTypeface(font_awesome);
+        chatText.setOnClickListener(this);
 
-
+        imgHello.setVisibility(View.VISIBLE);
+        listView.setVisibility(View.INVISIBLE);
+        sharedPreferences = getContext().getSharedPreferences(Var.MY_PREFERENCES, Context.MODE_PRIVATE);
+        accessToken = sharedPreferences.getString(Var.ACCESS_TOKEN, "");
+        avatarUrl = sharedPreferences.getString(Var.AVATAR, "");
+        if (!avatarUrl.equals("")) {
+            Log.d("TienDH", "Download image...");
+            new GetImageFromUrl().execute(avatarUrl);
+        } else {
+            Log.d("TienDH", "No link avatar...");
+        }
         chatText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 
             public void onFocusChange(View v, boolean hasFocus) {
@@ -104,6 +140,30 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
 
             }
         });
+        chatText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                imgHello.setVisibility(View.INVISIBLE);
+                listView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String text = s.toString().toLowerCase(Locale.getDefault());
+                if (text.equals("")) {
+                    imgSend.setTextColor(Color.parseColor("#747474"));
+                } else {
+                    imgSend.setTextColor(Color.parseColor("#00A5C3"));
+                }
+
+            }
+        });
+
         db = new DatabaseChat(getContext());
         lastId = db.getLastId();
         if (lastId <= Var.PAGE) {
@@ -119,8 +179,13 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
         imgSend.setOnClickListener(this);
         imgVoice.setOnClickListener(this);
         return rootView;
+    }
 
-
+    @Override
+    public void onResume() {
+        super.onResume();
+//        chatAdapter = new ChatAdapter(getContext(), R.layout.item_chat_left, items);
+//        listView.setAdapter(chatAdapter);
     }
 
     private void sendChatMessage(final String message) {// add message to list view
@@ -253,8 +318,28 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
                             "biết rõ hơn về tình hình sức khỏe của mình dựa vào những gì bạn " +
                             "mô tả tôi không thể biết được bạn bị bệnh gì"));
                 } else {
+                    DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                    Date date = new Date();
                     String result = "Bạn bị bệnh "
                             + sickList.get(location).getName();
+                    try {
+                        sendSickToServer(sickList.get(location).getName(), dateFormat.format(date), new VolleyCallback() {
+                            @Override
+                            public void onSuccess(JSONObject respond) {
+                                try {
+                                    if (respond.getString("status").equals("success")) {
+                                        Log.d("TienDH", respond.getString("result"));
+                                    } else {
+                                        Log.d("TienDH", respond.getString("result"));
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     String treatment = sickList.get(location).getTreatment();
                     String food = sickList.get(location).getFoods();
                     String banFoods = sickList.get(location).getBanFoods();
@@ -436,18 +521,27 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
 
         switch (v.getId()) {
             case R.id.btnSendMess:
+                imgHello.setVisibility(View.INVISIBLE);
+                listView.setVisibility(View.VISIBLE);
                 sendChatMessage(chatText.getText().toString());
                 break;
             case R.id.btnVoice:
+                imgHello.setVisibility(View.INVISIBLE);
+                listView.setVisibility(View.VISIBLE);
                 startVoiceRecognitionActivity();
+                break;
+            case R.id.edt_msg:
+                imgHello.setVisibility(View.INVISIBLE);
+                listView.setVisibility(View.VISIBLE);
                 break;
         }
     }
 
-    public void sendSickToServer(final String sickName, final VolleyCallback callback) throws JSONException {
+    public void sendSickToServer(final String sickName, final String datetime, final VolleyCallback callback) throws JSONException {
 
         final JSONObject jsonBody = new JSONObject();
         jsonBody.put(Var.SICKNAMETOSERVER, sickName);
+        jsonBody.put("date", datetime);
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.POST, Var.URL_SEND_SICK, jsonBody, new Response.Listener<JSONObject>() {
 
@@ -472,7 +566,94 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
         MySingleton.getInstance(getContext()).addToRequestQueue(jsObjRequest);
     }
 
+    public class GetImageFromUrl extends AsyncTask<String, Void, Bitmap> {
+        @Override
+        protected Bitmap doInBackground(String... urls) {
+            Bitmap map = null;
+            for (String url : urls) {
+                map = downloadImage(url);
+            }
+            return map;
+        }
+
+        // Sets the Bitmap returned by doInBackground
+        @Override
+        protected void onPostExecute(Bitmap result) {
+            Log.d("TienDH", "ChatFrag - download done");
+            storeImage(result, "avatar.png");
+        }
+
+        // Creates Bitmap from InputStream and returns it
+        private Bitmap downloadImage(String url) {
+            Bitmap bitmap = null;
+            InputStream stream = null;
+            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+            bmOptions.inSampleSize = 1;
+
+            try {
+                stream = getHttpConnection(url);
+                bitmap = BitmapFactory.decodeStream(stream, null, bmOptions);
+                stream.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            return bitmap;
+        }
+
+        // Makes HttpURLConnection and returns InputStream
+        private InputStream getHttpConnection(String urlString)
+                throws IOException {
+            InputStream stream = null;
+            URL url = new URL(urlString);
+            URLConnection connection = url.openConnection();
+
+            try {
+                HttpURLConnection httpConnection = (HttpURLConnection) connection;
+                httpConnection.setRequestMethod("GET");
+                httpConnection.connect();
+
+                if (httpConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    stream = httpConnection.getInputStream();
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return stream;
+        }
+
+
+    }
+
+    private boolean storeImage(Bitmap imageData, String filename) {
+        //get path to external storage (SD card)
+        String iconsStoragePath = Environment.getExternalStorageDirectory() + "/SAM/pictures/";
+        File sdIconStorageDir = new File(iconsStoragePath);
+
+        //create storage directories, if they don't exist
+        sdIconStorageDir.mkdirs();
+
+        try {
+            String filePath = sdIconStorageDir.toString() + "/" + filename;
+            FileOutputStream fileOutputStream = new FileOutputStream(filePath);
+            BufferedOutputStream bos = new BufferedOutputStream(fileOutputStream);
+
+            //choose another format if PNG doesn't suit you
+            imageData.compress(Bitmap.CompressFormat.PNG, 100, bos);
+
+            bos.flush();
+            bos.close();
+
+        } catch (FileNotFoundException e) {
+            Log.w("TienDH", "Error saving image file: " + e.getMessage());
+            return false;
+        } catch (IOException e) {
+            Log.w("TienDH", "Error saving image file: " + e.getMessage());
+            return false;
+        }
+        return true;
+    }
 }
+
 
 
 

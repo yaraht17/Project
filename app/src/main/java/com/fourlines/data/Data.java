@@ -1,6 +1,7 @@
 package com.fourlines.data;
 
 import com.fourlines.model.NotificationItem;
+import com.fourlines.model.SickHistoryItem;
 import com.fourlines.model.SickItem;
 import com.fourlines.model.UserItem;
 
@@ -12,4 +13,5 @@ public class Data {
     public static UserItem user;
     public static ArrayList<NotificationItem> notifList;
 
+    public static ArrayList<SickHistoryItem> sickHistoryList;
 }
