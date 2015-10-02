@@ -24,6 +24,6 @@
         android:layout_height="30dp"
         android:layout_alignParentRight="true"
         android:gravity="center"
-        android:src="@drawable/avatar_user" />
+        android:src="@drawable/benhnhan" />
 
 </RelativeLayout>

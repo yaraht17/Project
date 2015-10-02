@@ -1,21 +1,18 @@
 package com.fourlines.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 public class UserItem implements Serializable {
     private String id;
     private String email;
     private String fullname;
     private String avatarUrl;
-    private ArrayList<MedicalHistory> list;
 
-    public UserItem(String id, String email, String fullname, String avatarUrl, ArrayList<MedicalHistory> list) {
+    public UserItem(String id, String email, String fullname, String avatarUrl) {
         this.id = id;
         this.email = email;
         this.fullname = fullname;
         this.avatarUrl = avatarUrl;
-        this.list = list;
     }
 
     public UserItem(String id, String email, String fullname) {
@@ -60,11 +57,5 @@ public class UserItem implements Serializable {
         this.fullname = fullname;
     }
 
-    public ArrayList<MedicalHistory> getList() {
-        return list;
-    }
 
-    public void setList(ArrayList<MedicalHistory> list) {
-        this.list = list;
-    }
 }

@@ -11,7 +11,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.fourlines.data.Var;
-import com.fourlines.model.MedicalHistory;
 import com.fourlines.model.HistoryItem;
 import com.fourlines.model.SickItem;
 import com.fourlines.model.UserItem;
@@ -212,7 +211,7 @@ public class ConnectServer {
             avatarUrl = null;
 //            e.printStackTrace();
         }
-        UserItem data = new UserItem(id, email, fullname, avatarUrl, arrayToArraylist(array));
+        UserItem data = new UserItem(id, email, fullname, avatarUrl);
         sickHistoryItem.setUserItem(data);
 
         return sickHistoryItem;
@@ -245,9 +244,6 @@ public class ConnectServer {
         return items;
     }
 
-    public ArrayList<MedicalHistory> arrayToArraylist(JSONArray array) {
-        ArrayList<MedicalHistory> list = new ArrayList<>();
-        return list;
-    }
+
 }
 

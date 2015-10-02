@@ -116,8 +116,8 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
         sharedPreferences = getContext().getSharedPreferences(Var.MY_PREFERENCES, Context.MODE_PRIVATE);
         accessToken = sharedPreferences.getString(Var.ACCESS_TOKEN, "");
         avatarUrl = sharedPreferences.getString(Var.AVATAR, "");
-        if (!avatarUrl.equals("") || avatarUrl != null) {
-            Log.d("TienDH", "Download image...");
+        if (!avatarUrl.equals("") && avatarUrl != null) {
+            Log.d("TienDH", "Download image..." + avatarUrl.toString());
             if (ConnectionDetector.isNetworkConnected(getContext())) {
                 new GetImageFromUrl().execute(avatarUrl);
             }
@@ -598,6 +598,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
                 stream.close();
             } catch (IOException e1) {
                 e1.printStackTrace();
+                return null;
             }
             return bitmap;
         }
@@ -619,6 +620,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
+                return null;
             }
             return stream;
         }

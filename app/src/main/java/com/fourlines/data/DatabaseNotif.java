@@ -97,8 +97,13 @@ public class DatabaseNotif extends SQLiteOpenHelper {
     public ArrayList<NotificationItem> getNotifList() {
 
         ArrayList<NotificationItem> list = new ArrayList<NotificationItem>();
-        Cursor cursor = mSQLitedb.query(TABLE_NAME, null, null, null, null, null, null);
-
+        Cursor cursor = null;
+        try {
+            cursor = mSQLitedb.query(TABLE_NAME, null, null, null, null, null, null);
+        } catch (Exception e) {
+            cursor = null;
+        }
+        if (cursor == null) return list;
         while (cursor.moveToNext()) {
             int numberId = cursor.getColumnIndex(CL_ID);
             int numberTitle = cursor.getColumnIndex(CL_TITLE);

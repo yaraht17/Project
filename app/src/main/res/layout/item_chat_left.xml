@@ -9,7 +9,7 @@
         android:id="@+id/avatar"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:src="@drawable/ic_doctor" />
+        android:src="@drawable/bacsi" />
 
     <TextView
         android:id="@+id/msgr"

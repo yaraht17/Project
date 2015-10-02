@@ -10,8 +10,6 @@ import android.util.Log;
 import android.view.WindowManager;
 
 import com.fourlines.adapter.TabsPagerAdapter;
-import com.fourlines.data.DatabaseChat;
-import com.fourlines.data.DatabaseNotif;
 import com.fourlines.data.Var;
 import com.fourlines.view.PagerSlidingTabStrip;
 
@@ -22,16 +20,12 @@ public class MainActivity extends AppCompatActivity {
     private PagerSlidingTabStrip slideTabs;
     private SharedPreferences sharedPreferences;
     private String accessToken;
-    private DatabaseChat dbChat;
-    private DatabaseNotif dbNotif;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
-        dbChat = new DatabaseChat(getApplicationContext());
-        dbNotif = new DatabaseNotif(getApplicationContext());
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         slideTabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);

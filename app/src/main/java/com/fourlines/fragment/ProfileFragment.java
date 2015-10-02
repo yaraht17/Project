@@ -140,6 +140,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
         imageProfile = (ImageView) rootView.findViewById(R.id.imageUser);
         txtAlertSHealth = (TextView) rootView.findViewById(R.id.txtAlertSHealth);
         btnLogout.setOnClickListener(this);
+
+
         font_awesome = Typeface.createFromAsset(rootView.getContext().getAssets(), "fontawesome-webfont.ttf");
         iconLogout.setTypeface(font_awesome);
         iconLogout.setText(getString(R.string.logout));
@@ -157,10 +159,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // Create a HealthDataStore instance and set its listener
-        mStore = new HealthDataStore(getContext(), mConnectionListener);
-        // Request the connection to the health data store
-        mStore.connectService();
+//        // Create a HealthDataStore instance and set its listener
+//        mStore = new HealthDataStore(getContext(), mConnectionListener);
+//        // Request the connection to the health data store
+//        mStore.connectService();
 
         // Build GoogleApiClient with access to basic profile
         mGoogleApiClient = new GoogleApiClient.Builder(rootView.getContext())
@@ -205,7 +207,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
             progressBar.setVisibility(View.GONE);
             user = Data.user;
             if (ConnectionDetector.isNetworkConnected(rootView.getContext())) {
-                setInfoUser(user.getFullname(), user.getEmail(), user.getAvatarUrl());
+                Log.d("TienDH", "set info online");
+                String path = Environment.getExternalStorageDirectory() + "/SAM/pictures/avatar.png";
+                File file = new File(path);
+                if (file.exists()) {
+                    setInfoUserOffline(user.getFullname(), user.getEmail());
+                } else {
+                    setInfoUser(user.getFullname(), user.getEmail(), user.getAvatarUrl());
+                }
             } else {
                 setInfoUserOffline(user.getFullname(), user.getEmail());
             }
@@ -405,6 +414,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
 
         if (ConnectionDetector.isNetworkConnected(rootView.getContext())) {
             if (avatar != null) {
+                Log.d("TienDH", "download image " + avatar);
                 new GetImageFromUrl().execute(avatar);
             }
         }
@@ -415,7 +425,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
         con.getDataAccount(accessToken, new VolleyCallback() {
             @Override
             public void onSuccess(JSONObject respond) {
-                Log.d("TienDH", respond.toString());
+//                Log.d("TienDH", respond.toString());
                 try {
                     if (respond.getString("status").equals("fail")) {
                         Toast.makeText(rootView.getContext(), "Xảy ra lỗi, đăng nhập lại", Toast.LENGTH_SHORT).show();
@@ -427,8 +437,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
                         content.setVisibility(View.VISIBLE);
                         HistoryItem historyItem = con.responseToObject(respond);
                         user = new UserItem(historyItem.getUserItem().getId(), historyItem.getUserItem().getEmail(),
-                                historyItem.getUserItem().getFullname(), historyItem.getUserItem().getAvatarUrl(),
-                                historyItem.getUserItem().getList());
+                                historyItem.getUserItem().getFullname(), historyItem.getUserItem().getAvatarUrl());
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putString(Var.FULLNAME, user.getFullname());
                         editor.putString(Var.EMAIL, user.getEmail());
@@ -644,6 +653,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
                 stream.close();
             } catch (IOException e1) {
                 e1.printStackTrace();
+                return null;
             }
             return bitmap;
         }
@@ -665,6 +675,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
+                return null;
             }
             return stream;
         }
@@ -779,11 +790,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
                             while (c.moveToNext()) {
                                 height = c.getInt(c.getColumnIndex(HealthConstants.Weight.HEIGHT));
                                 weight = c.getInt(c.getColumnIndex(HealthConstants.Weight.WEIGHT));
-                                double tmp = (double) height / 100;
-                                bmi = (double) weight / (tmp * tmp);
-                                DecimalFormat df = new DecimalFormat("0.00");
-                                String str = df.format(bmi);
-                                bmi = Double.valueOf(str);
+                                if (height != 0 && weight != 0) {
+                                    double tmp = (double) height / 100;
+                                    bmi = (double) weight / (tmp * tmp);
+                                    DecimalFormat df = new DecimalFormat("0.00");
+                                    String str = df.format(bmi);
+                                    bmi = Double.valueOf(str);
+                                }
                             }
                         }
                     } finally {
@@ -870,7 +883,15 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, G
                                 c.close();
                             }
                         }
-                        drawCalo(listStepCount.get(listStepCount.size() - 2));
+                        //0 thi ko in
+                        //1 ng
+                        if (listStepCount.size() == 0) {
+                            drawCalo("0");
+                        } else if (listStepCount.size() == 1) {
+                            drawCalo(listStepCount.get(listStepCount.size() - 1));
+                        } else if (listStepCount.size() >= 2) {
+                            drawCalo(listStepCount.get(listStepCount.size() - 2));
+                        }
                         listStepCount = new ArrayList<>();
                     }
                 }
